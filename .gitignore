@@ -1,33 +1,28 @@
-# Next.js
+# ── Next.js ──────────────────────────────────────
 .next/
 out/
 
-# Dependencies
+# ── Dependencies ─────────────────────────────────
 node_modules/
+yarn.lock          # npm 사용 (package-lock.json 유지)
 
-# OS
+# ── Environment ──────────────────────────────────
+.env
+.env.local
+.env.*.local
+
+# ── OS ───────────────────────────────────────────
 .DS_Store
 Thumbs.db
 
-# Env
-.env
-.env.local
-.env.production
-
-# IDE
+# ── IDE ──────────────────────────────────────────
 .vscode/
 .idea/
 
-# 이전 Vite 잔재 (삭제해도 됨)
-vite.config.js
-src/main.jsx
-src/App.jsx
-src/index.css
-posts/
-index.html
-manifest.json
-scripts/generate-posts.js
+# ── Logs ─────────────────────────────────────────
+*.log
+npm-debug.log*
 
-# Obsidian 시스템 파일 (entries/ 폴더를 vault로 열었을 때)
+# ── Obsidian 시스템 파일 ──────────────────────────
 entries/.obsidian/
 entries/.trash/
