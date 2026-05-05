@@ -1,0 +1,29 @@
+# Next.js
+.next/
+out/
+
+# Dependencies
+node_modules/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Env
+.env
+.env.local
+.env.production
+
+# IDE
+.vscode/
+.idea/
+
+# 이전 Vite 잔재 (삭제해도 됨)
+vite.config.js
+src/main.jsx
+src/App.jsx
+src/index.css
+posts/
+index.html
+manifest.json
+scripts/generate-posts.js

@@ -1,0 +1,57 @@
+name: Deploy to AWS S3
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch: # 수동 실행도 가능
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build (SSG)
+        run: npm run build
+        # next.config.js의 output: 'export' 설정으로 out/ 폴더 생성
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }} # 예: ap-northeast-2 (서울)
+
+      - name: Sync to S3
+        run: |
+          aws s3 sync out/ s3://${{ secrets.S3_BUCKET }} \
+            --delete \
+            --cache-control "public, max-age=31536000, immutable" \
+            --exclude "*.html"
+
+          # HTML은 캐시 안 함 (항상 최신 버전)
+          aws s3 sync out/ s3://${{ secrets.S3_BUCKET }} \
+            --delete \
+            --cache-control "public, max-age=0, must-revalidate" \
+            --include "*.html" \
+            --exclude "*"
+
+      - name: Invalidate CloudFront cache
+        run: |
+          aws cloudfront create-invalidation \
+            --distribution-id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }} \
+            --paths "/*"
+
+      - name: Done
+        run: echo "✅ 배포 완료!"
