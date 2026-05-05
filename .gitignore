@@ -27,3 +27,7 @@ posts/
 index.html
 manifest.json
 scripts/generate-posts.js
+
+# Obsidian 시스템 파일 (entries/ 폴더를 vault로 열었을 때)
+entries/.obsidian/
+entries/.trash/
