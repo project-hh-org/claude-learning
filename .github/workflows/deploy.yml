@@ -35,17 +35,19 @@ jobs:
 
       - name: Sync to S3
         run: |
+          # 1. JS/CSS/이미지 등 정적 자산 — 장기 캐시 (immutable)
           aws s3 sync out/ s3://${{ secrets.S3_BUCKET }} \
             --delete \
             --cache-control "public, max-age=31536000, immutable" \
             --exclude "*.html"
 
-          # HTML은 캐시 안 함 (항상 최신 버전)
+          # 2. HTML만 별도 — 캐시 없음 + UTF-8 charset 명시
+          # --exclude "*" 먼저, --include "*.html" 나중 (순서 중요!)
           aws s3 sync out/ s3://${{ secrets.S3_BUCKET }} \
-            --delete \
             --cache-control "public, max-age=0, must-revalidate" \
-            --include "*.html" \
-            --exclude "*"
+            --content-type "text/html; charset=utf-8" \
+            --exclude "*" \
+            --include "*.html"
 
       - name: Invalidate CloudFront cache
         run: |
