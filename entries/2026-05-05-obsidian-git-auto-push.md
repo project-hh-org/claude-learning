@@ -92,4 +92,4 @@ bash scripts/install-launchd.sh --uninstall
 
 ---
 
-_작성일: 2026-05-05 · Claude + 다희_
+_2026-05-05_

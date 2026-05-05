@@ -3,11 +3,6 @@ title: "심볼릭 링크로 단일 소스 관리하기"
 date: "2026-04-24"
 summary: "CLI 스크립트를 Git 레포에서 관리하면서 PATH에도 올려두고 싶을 때 — `cp` 대신 `ln -sf` 한 줄로 해결하는 방법."
 tags: ["Bash", "CLI", "dotfiles", "Unix"]
-type: "lab"
-category: "DevTools"
-stage: "evergreen"
-links: []
-references: []
 ---
 
 ## 문제: 스크립트를 어디서 관리해야 하나
@@ -83,4 +78,4 @@ ls -la ~/.local/bin/ship
 
 ---
 
-_작성일: 2026-04-24 · 다희_
+_2026-04-24_
