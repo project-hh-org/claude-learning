@@ -43,4 +43,4 @@ readTime: 5
 
 ---
 
-_작성일: YYYY-MM-DD · Claude + 다희_
+_YYYY-MM-DD_
