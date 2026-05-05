@@ -156,7 +156,7 @@ a { color: inherit; text-decoration: none; }
   color: var(--muted);
   border: 1px solid var(--border);
 }
-.pc-readtime { font-size: 11px; color: var(--border); margin-left: auto; }
+/* .pc-readtime removed */
 
 /* ─── No results ─── */
 .no-results { text-align: center; padding: 60px 0; color: var(--muted); font-size: 14px; }
@@ -215,7 +215,6 @@ a { color: inherit; text-decoration: none; }
 }
 .back-btn:hover { color: var(--accent); }
 .post-meta { display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--muted); margin-bottom: 14px; }
-.post-readtime::before { content: '·'; margin-right: 10px; }
 .post-title { font-size: 30px; font-weight: 800; line-height: 1.35; letter-spacing: -0.5px; margin-bottom: 16px; }
 .post-summary {
   font-size: 15px;
@@ -229,7 +228,34 @@ a { color: inherit; text-decoration: none; }
 }
 .post-tags { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 36px; }
 .post-tag { padding: 4px 11px; border-radius: 20px; font-size: 12px; background: rgba(167, 139, 250, 0.12); color: var(--accent); }
+.meta-dot { color: var(--border); }
+
+.lab-links-bar {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 28px;
+}
+
 .post-divider { border: none; border-top: 1px solid var(--border); margin-bottom: 36px; }
+
+.post-references {
+  margin-top: 48px;
+  padding-top: 24px;
+  border-top: 1px solid var(--border);
+}
+.post-references h3 {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  margin-bottom: 12px;
+}
+.post-references ul { list-style: none; padding: 0; }
+.post-references li { padding: 5px 0; font-size: 13px; }
+.post-references a { color: var(--blue); }
+.post-references a:hover { text-decoration: underline; }
 
 /* ─── Markdown body ─── */
 .post-body { font-size: 15px; line-height: 1.85; color: #d4d4d8; }
@@ -283,3 +309,85 @@ a { color: inherit; text-decoration: none; }
 
 /* highlight.js overrides */
 .hljs { background: #0d0d10 !important; padding: 0 !important; }
+
+/* ─── Section Header ─── */
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+}
+.section-icon { font-size: 15px; }
+.section-title { font-size: 13px; font-weight: 700; color: var(--text); text-transform: uppercase; letter-spacing: 0.6px; }
+.section-count {
+  font-size: 11px;
+  background: var(--surface2);
+  color: var(--muted);
+  padding: 1px 7px;
+  border-radius: 20px;
+  border: 1px solid var(--border);
+}
+.section-desc { font-size: 12px; color: var(--muted); margin-left: auto; }
+
+/* ─── Lab Section ─── */
+.lab-section { margin-top: 52px; }
+
+.lab-grid { display: flex; flex-direction: column; gap: 14px; }
+
+.lab-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px 22px;
+  transition: border-color 0.15s, transform 0.15s;
+  border-left: 3px solid var(--blue);
+}
+.lab-card:hover { border-color: var(--blue); transform: translateX(2px); }
+
+.lab-card-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.lab-category {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+}
+.lab-stage {
+  font-size: 11px;
+  color: var(--muted);
+  background: var(--surface2);
+  padding: 2px 8px;
+  border-radius: 20px;
+  border: 1px solid var(--border);
+}
+.lab-date { font-size: 11px; color: var(--border); margin-left: auto; }
+
+.lab-title { font-size: 16px; font-weight: 700; line-height: 1.45; margin-bottom: 8px; }
+.lab-summary { font-size: 13px; color: var(--muted); line-height: 1.65; margin-bottom: 12px; }
+
+.lab-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 14px; }
+
+.lab-links {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding-top: 12px;
+  border-top: 1px solid rgba(63, 63, 70, 0.4);
+}
+.lab-link {
+  font-size: 12px;
+  color: var(--blue);
+  background: rgba(96, 165, 250, 0.08);
+  border: 1px solid rgba(96, 165, 250, 0.2);
+  padding: 3px 10px;
+  border-radius: 6px;
+  transition: all 0.15s;
+  text-decoration: none;
+}
+.lab-link:hover { background: rgba(96, 165, 250, 0.18); border-color: var(--blue); }
