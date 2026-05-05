@@ -37,11 +37,14 @@ export function getAllPosts() {
     const slug = file.replace(/\.md$/, '')
     return {
       slug,
-      title: data.title || slug,
-      date: data.date || slug.slice(0, 10),
-      summary: data.summary || '',
-      tags: data.tags || [],
-      readTime: data.readTime || 5,
+      title:    data.title    || slug,
+      date:     data.date     || slug.slice(0, 10),
+      summary:  data.summary  || '',
+      tags:     data.tags     || [],
+      type:     data.type     || 'note',   // 'note' | 'lab'
+      category: data.category || null,
+      stage:    data.stage    || null,
+      links:    data.links    || [],
     }
   })
 }
@@ -57,11 +60,15 @@ export async function getPostBySlug(slug) {
 
   return {
     slug,
-    title: data.title || slug,
-    date: data.date || slug.slice(0, 10),
-    summary: data.summary || '',
-    tags: data.tags || [],
-    readTime: data.readTime || Math.max(1, Math.ceil(content.split(/\s+/).length / 200)),
+    title:      data.title      || slug,
+    date:       data.date       || slug.slice(0, 10),
+    summary:    data.summary    || '',
+    tags:       data.tags       || [],
+    type:       data.type       || 'note',
+    category:   data.category   || null,
+    stage:      data.stage      || null,
+    links:      data.links      || [],
+    references: data.references || [],
     contentHtml,
   }
 }

@@ -7,15 +7,29 @@ function formatDate(dateStr) {
   return `${d.getFullYear()}년 ${d.getMonth() + 1}월 ${d.getDate()}일`
 }
 
+const STAGE_LABEL = {
+  evergreen: '🌿 Evergreen',
+  seedling:  '🌱 Seedling',
+  budding:   '🌸 Budding',
+}
+
+const CATEGORY_COLOR = {
+  AI:       'var(--accent)',
+  DevTools: 'var(--blue)',
+  Infra:    'var(--green)',
+  Design:   'var(--orange)',
+}
+
 export default function PostDetail({ post }) {
   const router = useRouter()
+  const isLab = post.type === 'lab'
 
   return (
     <>
       {/* ── Header ── */}
       <header className="header">
         <div className="header-logo" onClick={() => router.push('/')}>
-          📚 Learning Log <span>· 다희의 개발 학습 기록</span>
+          📚 Learning Log <span>· 다희의 개발 기록</span>
         </div>
       </header>
 
@@ -27,7 +41,20 @@ export default function PostDetail({ post }) {
 
         <div className="post-meta">
           <span>{formatDate(post.date)}</span>
-          <span className="post-readtime">읽는 시간 {post.readTime}분</span>
+          {isLab && post.category && (
+            <>
+              <span className="meta-dot">·</span>
+              <span style={{ color: CATEGORY_COLOR[post.category] || 'var(--muted)', fontWeight: 600 }}>
+                {post.category}
+              </span>
+            </>
+          )}
+          {isLab && post.stage && (
+            <>
+              <span className="meta-dot">·</span>
+              <span>{STAGE_LABEL[post.stage] || post.stage}</span>
+            </>
+          )}
         </div>
 
         <h1 className="post-title">{post.title}</h1>
@@ -40,13 +67,45 @@ export default function PostDetail({ post }) {
           ))}
         </div>
 
+        {/* Lab 링크 */}
+        {isLab && post.links?.length > 0 && (
+          <div className="lab-links-bar">
+            {post.links.map(link => (
+              <a
+                key={link.url}
+                href={link.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="lab-link"
+              >
+                {link.label} ↗
+              </a>
+            ))}
+          </div>
+        )}
+
         <hr className="post-divider" />
 
-        {/* 빌드 시 서버에서 변환된 HTML 렌더링 */}
         <div
           className="post-body"
           dangerouslySetInnerHTML={{ __html: post.contentHtml }}
         />
+
+        {/* References */}
+        {isLab && post.references?.length > 0 && (
+          <div className="post-references">
+            <h3>참고 자료</h3>
+            <ul>
+              {post.references.map(ref => (
+                <li key={ref.url}>
+                  <a href={ref.url} target="_blank" rel="noopener noreferrer">
+                    {ref.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
       </article>
     </>
   )

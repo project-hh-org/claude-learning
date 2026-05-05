@@ -1,0 +1,27 @@
+[
+  {
+    "id": "ship-tmux-multi-agent",
+    "title": "tmux + Claude Agent로 기획부터 PR까지 원커맨드 자동화하기",
+    "category": "AI",
+    "stage": "evergreen",
+    "date": "2026-04-24",
+    "summary": "`ship` 한 줄로 브랜치 생성 · 멀티 에이전트 병렬 실행 · CI 게이트 · PR 생성까지. tmux Wave 패턴으로 설계한 AI 개발 워크플로우 이야기.",
+    "tags": ["Claude Code", "tmux", "Multi-Agent", "Automation", "Bash"],
+    "links": [
+      { "label": "GitHub", "url": "https://github.com/project-hh-com/tmux" },
+      { "label": "문서", "url": "https://project-hh-com.github.io/tmux" },
+      { "label": "튜토리얼", "url": "https://project-hh-com.github.io/tmux/ship/ship-tutorial.html" },
+      { "label": "개요", "url": "https://project-hh-com.github.io/tmux/ship/ship-overview.html" }
+    ]
+  },
+  {
+    "id": "symlink-single-source",
+    "title": "심볼릭 링크로 단일 소스 관리하기",
+    "category": "DevTools",
+    "stage": "evergreen",
+    "date": "2026-04-24",
+    "summary": "CLI 스크립트를 Git 레포에서 관리하면서 PATH에도 올려두고 싶을 때 — `cp` 대신 `ln -sf` 한 줄로 해결하는 방법.",
+    "tags": ["Bash", "CLI", "dotfiles", "Unix"],
+    "links": []
+  }
+]
