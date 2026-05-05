@@ -31,7 +31,7 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ secrets.AWS_REGION }} # 예: ap-northeast-2 (서울)
+          aws-region: ap-northeast-2
 
       - name: Sync to S3
         run: |
@@ -54,4 +54,4 @@ jobs:
             --paths "/*"
 
       - name: Done
-        run: echo "✅ 배포 완료!"
+        run: echo "✅ 배포 완료! https://claude-learning.project-hh.com"
