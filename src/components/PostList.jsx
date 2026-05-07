@@ -108,6 +108,12 @@ export default function PostList({ posts, configs = [] }) {
           🔧 Claude Configs
           {configs.length > 0 && <span className="tab-count">{configs.length}</span>}
         </button>
+        <button className="tab-btn" onClick={() => router.push('/ideas')}>
+          💡 Ideas
+        </button>
+        <button className="tab-btn" onClick={() => router.push('/seeds')}>
+          🌱 Seeds
+        </button>
       </div>
 
       <div className="page-wrap">

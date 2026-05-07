@@ -127,6 +127,18 @@ tail -f /tmp/claude-learn-watcher.log
 
 ---
 
+## 아이디어 자동 캡처
+
+thinking 중 떠오른 발상을 즉시 마크다운으로 저장하는 파이프라인이 포함되어 있다.
+
+- `ideas/` — 현재 프로젝트 맥락의 메모/생각
+- `seeds/` — 별개 새 프로젝트 씨앗 (간단 기획 + starter prompt 포함)
+- 웹: `/ideas`, `/seeds`
+
+머신별 1회 셋업이 필요하다 → [`docs/idea-capture-setup.md`](docs/idea-capture-setup.md)
+
+---
+
 ## 인프라
 
 | 항목 | 값 |
