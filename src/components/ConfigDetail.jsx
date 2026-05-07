@@ -23,7 +23,7 @@ export default function ConfigDetail({ config }) {
             {config.emoji} {config.label}
           </span>
           <span className="meta-dot">·</span>
-          <span>~/.claude/{config.category}/{config.slug}.md</span>
+          <span>{config.installPath || `~/.claude/${config.category}/${config.slug}.md`}</span>
         </div>
 
         <h1 className="post-title">{config.title}</h1>
