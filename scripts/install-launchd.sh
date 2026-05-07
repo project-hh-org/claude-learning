@@ -7,7 +7,7 @@
 # =============================================================
 
 REPO_DIR="$(cd "$(dirname "$0")/.." && pwd)"
-PLIST_LABEL="co.danble.claude-learn-watcher"
+PLIST_LABEL="dev.claude.learn-watcher"
 PLIST_PATH="$HOME/Library/LaunchAgents/${PLIST_LABEL}.plist"
 LOG_PATH="/tmp/claude-learn-watcher.log"
 

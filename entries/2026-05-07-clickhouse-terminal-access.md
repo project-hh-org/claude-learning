@@ -3,6 +3,12 @@ title: "ClickHouse 터미널 접속 — AWS Secrets Manager + ch 명령어"
 date: "2026-05-07"
 summary: "AWS Secrets Manager에서 자격증명을 매번 실시간으로 가져와 ClickHouse에 접속하는 ch 명령어를 설정했다."
 tags: ["clickhouse", "aws", "secrets-manager", "security", "terminal", "devtools"]
+related:
+  - slug: "2026-04-24-symlink-single-source"
+    label: "심볼릭 링크로 단일 소스 관리하기"
+concepts:
+  - slug: "aws-secrets-manager-pattern"
+    label: "AWS Secrets Manager 자격증명 패턴"
 ---
 
 ## 🔍 배경 / 맥락
@@ -15,7 +21,7 @@ ClickHouse에 터미널에서 접속하고 싶었다. 보안 원칙상 자격증
 
 ### 자격증명 위치
 
-`danble-env-production` secret (리전: `ap-northeast-2`)에 ClickHouse 접속 정보가 포함되어 있다:
+AWS Secrets Manager의 앱 환경 secret (리전: `ap-northeast-2`)에 ClickHouse 접속 정보가 포함되어 있다:
 
 - `CLICKHOUSE_HOST`
 - `CLICKHOUSE_DATABASE`
@@ -44,7 +50,7 @@ xattr -d com.apple.quarantine \
 cat > /opt/homebrew/bin/ch << 'EOF'
 #!/bin/bash
 eval $(aws secretsmanager get-secret-value \
-  --secret-id danble-env-production \
+  --secret-id YOUR_SECRET_ID \
   --region ap-northeast-2 \
   --query SecretString --output text | \
   python3 -c "
@@ -97,3 +103,11 @@ GROUP BY table ORDER BY sum(bytes) DESC;
 - `ch` 명령어 하나로 ClickHouse 접속
 - 자격증명은 매 접속마다 AWS Secrets Manager에서 실시간 발급, 종료 후 `unset`으로 즉시 제거
 - 자격증명이 히스토리·파일·환경변수 어디에도 남지 않음
+
+---
+
+## 🔀 연결된 노트
+
+핵심 개념: [[aws-secrets-manager-pattern]]
+
+`ch` 스크립트 자체 관리: [[2026-04-24-symlink-single-source|심볼릭 링크 단일 소스 패턴]]으로 `/opt/homebrew/bin/ch`를 레포에서 관리할 수 있다.

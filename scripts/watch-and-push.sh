@@ -1,6 +1,6 @@
 #!/bin/bash
 # =============================================================
-# Claude Learning Log — entries/ + configs/ 자동 push 워처
+# Claude Learning Log — 전체 레포 자동 push 워처
 #
 # 사전 준비:  brew install fswatch
 # 실행:       bash scripts/watch-and-push.sh
@@ -11,13 +11,10 @@
 # =============================================================
 
 REPO_DIR="$(cd "$(dirname "$0")/.." && pwd)"
-WATCH_DIRS=("$REPO_DIR/entries" "$REPO_DIR/configs")
 DEBOUNCE_SECS=4          # 마지막 이벤트 후 N초 기다렸다가 커밋
 
-echo "👀 감시 시작:"
-echo "   - entries/"
-echo "   - configs/"
-echo "📌 .md 파일에 실제 변경사항이 있을 때만 자동 commit + push"
+echo "👀 감시 시작: 전체 레포 ($REPO_DIR)"
+echo "📌 git이 추적하는 파일에 변경사항이 있을 때만 자동 commit + push"
 echo "   종료: Ctrl+C"
 echo ""
 
@@ -30,14 +27,16 @@ fi
 LAST_EVENT_FILE="/tmp/learn-watcher-last-event"
 
 fswatch -0 --event Created --event Updated --event Renamed \
-  --include='\.md$' "${WATCH_DIRS[@]}" | \
+  --exclude='\.git' \
+  --exclude='node_modules' \
+  --exclude='\.next' \
+  --exclude='out/' \
+  "$REPO_DIR" | \
 while IFS= read -r -d "" event; do
-  # 타임스탬프 찍고 debounce 타이머 리셋
   date +%s > "$LAST_EVENT_FILE"
 
   (
     sleep "$DEBOUNCE_SECS"
-    # debounce: 마지막 이벤트 이후 DEBOUNCE_SECS초가 지났을 때만 실행
     last=$(cat "$LAST_EVENT_FILE" 2>/dev/null || echo 0)
     now=$(date +%s)
     elapsed=$(( now - last ))
@@ -45,23 +44,20 @@ while IFS= read -r -d "" event; do
 
     cd "$REPO_DIR" || exit 1
 
-    # --- 실제 변경사항 확인 (entries/ + configs/) ---
-    CHANGED=$(git status --porcelain entries/ configs/ 2>/dev/null | grep '\.md' | grep -v '^!!')
+    # git이 추적하는 파일 중 실제 변경된 것만
+    CHANGED=$(git status --porcelain 2>/dev/null | grep -v '^!!' | grep -v 'node_modules' | grep -v '\.next')
     [ -z "$CHANGED" ] && exit 0
 
     echo "📝 변경된 파일:"
     echo "$CHANGED"
 
-    # push 전 최신 상태 pull (충돌 방지)
     echo "⬇️  pull --rebase..."
     git pull --rebase origin main 2>&1 | tail -3
 
-    git add entries/ configs/
+    git add -A
 
-    # 변경된 파일명으로 커밋 메시지 생성
-    FILES=$(git diff --cached --name-only entries/ configs/ | \
-            sed 's|entries/||' | sed 's|configs/||' | sed 's|\.md||' | \
-            tr '\n' ', ' | sed 's/,$//')
+    # 변경 파일 목록으로 커밋 메시지 생성
+    FILES=$(git diff --cached --name-only | grep -v 'node_modules' | tr '\n' ', ' | sed 's/,$//')
     COMMIT_MSG="learn: ${FILES}"
     [ ${#COMMIT_MSG} -gt 72 ] && COMMIT_MSG="${COMMIT_MSG:0:69}..."
 

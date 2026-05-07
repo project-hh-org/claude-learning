@@ -393,3 +393,138 @@ a { color: inherit; text-decoration: none; }
   text-decoration: none;
 }
 .lab-link:hover { background: rgba(96, 165, 250, 0.18); border-color: var(--blue); }
+
+/* ─── Stage Badge ─── */
+.stage-badge {
+  font-size: 11px;
+  font-weight: 600;
+  border: 1px solid;
+  padding: 2px 8px;
+  border-radius: 20px;
+  letter-spacing: 0.02em;
+}
+
+/* ─── Concept type badge ─── */
+.concept-type-badge {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--accent);
+  background: rgba(167, 139, 250, 0.1);
+  border: 1px solid rgba(167, 139, 250, 0.3);
+  padding: 2px 8px;
+  border-radius: 20px;
+}
+
+/* ─── Zettelkasten: 개념 칩 ─── */
+.zettel-concepts {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin: 12px 0;
+}
+.zettel-label {
+  font-size: 11px;
+  color: var(--muted);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.concept-chip {
+  font-size: 12px;
+  color: var(--accent);
+  background: rgba(167, 139, 250, 0.08);
+  border: 1px solid rgba(167, 139, 250, 0.25);
+  padding: 3px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s;
+  font-family: inherit;
+}
+.concept-chip:hover {
+  background: rgba(167, 139, 250, 0.18);
+  border-color: var(--accent);
+}
+
+/* ─── Zettelkasten: 관련 글 / 백링크 섹션 ─── */
+.zettel-section {
+  margin-top: 40px;
+  padding-top: 24px;
+  border-top: 1px solid var(--border);
+}
+.zettel-section-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 12px;
+}
+.zettel-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.zettel-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 16px;
+  cursor: pointer;
+  transition: all 0.15s;
+  text-align: left;
+  font-family: inherit;
+}
+.zettel-card:hover {
+  border-color: var(--accent);
+  background: rgba(167, 139, 250, 0.06);
+}
+.zettel-card--backlink:hover {
+  border-color: var(--blue);
+  background: rgba(96, 165, 250, 0.06);
+}
+.zettel-card-label {
+  font-size: 14px;
+  color: var(--text);
+  font-weight: 500;
+  flex: 1;
+}
+.zettel-card-summary {
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 2px;
+  display: block;
+  line-height: 1.4;
+}
+.zettel-card-arrow {
+  font-size: 14px;
+  color: var(--muted);
+  flex-shrink: 0;
+}
+.zettel-card:has(.zettel-card-summary) {
+  flex-direction: column;
+  align-items: flex-start;
+}
+.zettel-card:has(.zettel-card-summary) .zettel-card-arrow {
+  display: none;
+}
+
+/* ─── Wikilink 인라인 스타일 ─── */
+.post-body .wikilink {
+  color: var(--accent);
+  text-decoration: underline;
+  text-decoration-style: dotted;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+.post-body .wikilink--concept {
+  color: var(--green);
+}
+.post-body .wikilink:hover {
+  text-decoration-style: solid;
+}

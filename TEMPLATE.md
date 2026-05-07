@@ -4,6 +4,12 @@ date: "YYYY-MM-DD"
 summary: "한 줄 요약 — 이 글에서 배운 핵심을 한 문장으로"
 tags: ["태그1", "태그2", "태그3"]
 readTime: 5
+related:
+  - slug: "YYYY-MM-DD-slug"
+    label: "관련 글 제목"
+concepts:
+  - slug: "concept-slug"
+    label: "개념 이름"
 ---
 
 ## 🔍 배경 / 맥락
@@ -40,6 +46,14 @@ readTime: 5
 ## 🔗 참고 자료
 
 - [제목](URL)
+
+---
+
+## 🔀 연결된 노트
+
+핵심 개념: [[concept-slug|개념 이름]]
+
+연관 글: [[YYYY-MM-DD-slug|글 제목]]
 
 ---
 

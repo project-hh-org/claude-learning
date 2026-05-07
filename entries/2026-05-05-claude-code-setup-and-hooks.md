@@ -4,6 +4,16 @@ date: "2026-05-05"
 summary: "Claude Code의 Hooks 시스템으로 main push 차단·.env 보호·Prettier 자동화를 설정하고, 8개 플러그인과 실측 기반 대시보드를 구축했다."
 tags: ["claude-code", "hooks", "claude-md", "productivity", "developer-tools", "security", "automation"]
 readTime: 6
+related:
+  - slug: "2026-04-24-ship-tmux-multi-agent"
+    label: "tmux + Claude Agent로 기획부터 PR까지"
+  - slug: "2026-05-05-obsidian-git-auto-push"
+    label: "Obsidian Git 자동 push 설정"
+concepts:
+  - slug: "claude-code-hooks"
+    label: "Claude Code Hooks"
+  - slug: "claude-md-architecture"
+    label: "CLAUDE.md 3계층 아키텍처"
 ---
 
 ## 🔍 배경 / 맥락
@@ -114,5 +124,12 @@ EOF
 - [superpowers 플러그인](https://github.com/obra/superpowers)
 
 ---
+
+## 🔀 연결된 노트
+
+핵심 개념: [[claude-code-hooks]], [[claude-md-architecture]]
+
+이 설정을 실제 워크플로우에 적용한 사례: [[2026-04-24-ship-tmux-multi-agent|ship — tmux 멀티 에이전트 자동화]]
+자동 push 자동화와 함께 보면 좋은 글: [[2026-05-05-obsidian-git-auto-push|Obsidian Git 자동 push]]
 
 _2026-05-05_

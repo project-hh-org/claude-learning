@@ -3,6 +3,12 @@ title: "심볼릭 링크로 단일 소스 관리하기"
 date: "2026-04-24"
 summary: "CLI 스크립트를 Git 레포에서 관리하면서 PATH에도 올려두고 싶을 때 — `cp` 대신 `ln -sf` 한 줄로 해결하는 방법."
 tags: ["Bash", "CLI", "dotfiles", "Unix"]
+related:
+  - slug: "2026-04-24-ship-tmux-multi-agent"
+    label: "tmux + Claude Agent로 기획부터 PR까지"
+concepts:
+  - slug: "symlink-single-source"
+    label: "심볼릭 링크 단일 소스 패턴"
 ---
 
 ## 문제: 스크립트를 어디서 관리해야 하나
@@ -77,5 +83,11 @@ ls -la ~/.local/bin/ship
 - **여러 버전 전환** — 링크 대상만 바꾸면 실행 파일 없이 버전 전환 가능
 
 ---
+
+## 🔀 연결된 노트
+
+핵심 개념: [[symlink-single-source]]
+
+이 방법으로 관리하는 실제 도구: [[2026-04-24-ship-tmux-multi-agent|ship — tmux 멀티 에이전트 자동화]]
 
 _2026-04-24_
