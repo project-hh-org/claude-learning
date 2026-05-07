@@ -24,5 +24,6 @@ Thumbs.db
 npm-debug.log*
 
 # ── Obsidian 시스템 파일 ──────────────────────────
-entries/.obsidian/
-entries/.trash/
+.obsidian/
+.trash/
+app.json
