@@ -3,6 +3,11 @@ title: "자격증명 보안 규칙"
 description: "모든 외부 서비스 접근 시 적용되는 자격증명 관리 원칙. AWS Secrets Manager 기반."
 category: "rules"
 tags: ["security", "aws", "credentials"]
+related:
+  - slug: "aws-secrets-manager-pattern"
+    label: "AWS Secrets Manager 자격증명 패턴"
+  - slug: "2026-05-07-clickhouse-terminal-access"
+    label: "ClickHouse 터미널 접속"
 ---
 
 ## AWS Secrets Manager 원칙
@@ -64,3 +69,8 @@ throw new Error(`Auth failed for user=${username} pass=${password}`);
 - 쿼리·응답 결과에 자격증명이 포함되어 있어도 출력하지 않는다
 - 매 세션마다 Secret Manager를 새로 호출하는 방식만 제안한다
 - 이전 세션의 자격증명을 기억하거나 재사용하지 않는다
+
+## 관련 노트
+
+이 규칙의 실제 구현 패턴: [[concepts/aws-secrets-manager-pattern|AWS Secrets Manager 패턴]]
+터미널 적용 사례: [[2026-05-07-clickhouse-terminal-access|ClickHouse 터미널 접속]]

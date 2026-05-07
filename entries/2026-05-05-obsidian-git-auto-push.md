@@ -4,6 +4,11 @@ date: "2026-05-05"
 summary: "Obsidian Git 플러그인으로 entries/ 폴더 변경 시 자동 commit+push, GitHub Actions 트리거까지 연결하는 방법"
 tags: ["obsidian", "git", "automation", "workflow", "obsidian-git"]
 readTime: 4
+related:
+  - slug: "2026-05-05-claude-code-setup-and-hooks"
+    label: "Claude Code 환경 최적화 — Hooks, CLAUDE.md"
+  - slug: "2026-04-24-ship-tmux-multi-agent"
+    label: "tmux + Claude Agent로 기획부터 PR까지"
 ---
 
 ## 🔍 배경 / 맥락
@@ -91,5 +96,10 @@ bash scripts/install-launchd.sh --uninstall
 - [Obsidian 커뮤니티 플러그인 안내](https://help.obsidian.md/Extending+Obsidian/Community+plugins)
 
 ---
+
+## 🔀 연결된 노트
+
+자동화 워크플로우 전체 그림: [[2026-04-24-ship-tmux-multi-agent|ship — tmux 멀티 에이전트 자동화]]
+Claude Code 환경과 함께 세팅: [[2026-05-05-claude-code-setup-and-hooks|Claude Code 환경 최적화]]
 
 _2026-05-05_
