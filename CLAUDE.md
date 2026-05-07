@@ -8,23 +8,30 @@ URL: https://claude-learning.project-hh.com
 ```
 entries/          ← 날짜 기반 학습 로그 (서사형, "무엇을 했나")
 concepts/         ← 원자적 개념 노트 (영구 노트, "무엇인가") ← 제텔카스텐
+ideas/            ← thinking 자동 캡처 — 현재 프로젝트 맥락의 메모/생각
+seeds/            ← thinking 자동 캡처 — 별개 새 프로젝트 씨앗 (기획+starter prompt)
 moc/              ← Map of Content (주제 인덱스, Dataview 쿼리) ← 선택적
-configs/          ← Claude rule/hook/command 파일
+configs/          ← Claude rule/hook/command/skill 파일
   rules/          ← ~/.claude/rules/ 에 설치되는 규칙 파일
   hooks/          ← Claude hooks 스크립트
   commands/       ← 커스텀 Claude 명령어
+  skills/         ← Claude skill 번들 (예: capture-idea/)
 src/
   app/            ← Next.js App Router
     [slug]/       ← Entry 상세 페이지
     concept/[slug]/ ← Concept 상세 페이지
     configs/[category]/[slug]/  ← Config 상세 페이지
-  components/     ← PostDetail, ConceptDetail, PostList, ConfigDetail
+    ideas/, ideas/[slug]/        ← Ideas 인덱스/상세
+    seeds/, seeds/[slug]/        ← Seeds 인덱스/상세
+  components/     ← PostDetail, ConceptDetail, PostList, ConfigDetail, IdeaList, IdeaDetail, SeedList, SeedDetail
   lib/
     posts.js      ← entries/ 파싱 + wikilink 변환 + 백링크 계산
     concepts.js   ← concepts/ 파싱
+    ideas.js      ← ideas/ 파싱
+    seeds.js      ← seeds/ 파싱 + starter_prompt 추출
     wikilink.js   ← [[wikilink]] → HTML 변환 유틸
     configs.js    ← configs/ 파싱
-scripts/          ← 자동 push 워처, launchd 설치
+scripts/          ← 자동 push 워처, launchd 설치, Desktop 셋업
 public/
 TEMPLATE.md       ← entry 작성 템플릿
 CONCEPT_TEMPLATE.md ← concept 작성 템플릿
@@ -148,6 +155,32 @@ category: "rules"   # rules | hooks | commands
 tags: ["tag1"]
 ---
 ```
+
+---
+
+## 아이디어 자동 캡처 (Ideas / Seeds)
+
+thinking 중 떠오른 발상이 휘발되지 않도록 즉시 마크다운으로 저장하는 파이프라인.
+
+### 두 갈래
+
+| 분류 | 폴더 | 무엇을 |
+|---|---|---|
+| 현재 프로젝트 맥락의 메모/생각 | `ideas/` | 짧은 메모 (kind=spark) 또는 적용 아이디어 (kind=buildable) |
+| 완전히 별개의 새 프로젝트 씨앗 | `seeds/` | 한 줄 피치 + 간단 기획 + 새 세션 starter prompt |
+
+판단 기준 한 줄: **"이 발상을 실현하려면 새 레포를 파야 하는가?"** → yes면 `seeds/`.
+
+### 구성요소
+
+- 룰: `configs/rules/capture-ideas.md` — 발상 즉시 캡처를 강제
+- 스킬: `configs/skills/capture-idea/SKILL.md` — 트리거 패턴 + 마크다운 템플릿
+- 안전망 hook: `configs/hooks/idea-safety-net.sh` — Stop 시점에 누락분 후처리
+- Desktop 셋업: `scripts/setup-claude-desktop.sh` — 공식 filesystem MCP 1회 등록
+
+### 캡처 후 흐름
+
+`ideas/` 또는 `seeds/`에 파일 생성 → 자동 push → S3 배포 → `/ideas`, `/seeds` 페이지에서 열람. seed 페이지의 "📋 프롬프트 복사" 버튼으로 starter prompt를 즉시 새 세션에 사용 가능.
 
 ---
 
