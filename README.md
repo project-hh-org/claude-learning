@@ -94,6 +94,19 @@ updated: "2026-05-07"
 
 ---
 
+## 새 기기 셋업
+
+```bash
+git clone https://github.com/project-hh-org/claude-learning.git
+cd claude-learning
+bash scripts/bootstrap.sh                  # npm install + Claude Code 설정 + vault 경로 기록
+bash scripts/setup-claude-desktop.sh       # (선택) Claude Desktop chat app용 filesystem MCP
+```
+
+`bootstrap.sh`가 `~/.claude/learning-vault.path`에 이 레포 절대경로를 기록 → **다른 cwd에서 작업할 때도 캡처된 ideas/seeds/concepts가 항상 이 레포로 모임**.
+
+---
+
 ## 로컬 개발
 
 ```bash

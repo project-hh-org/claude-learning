@@ -41,9 +41,11 @@ bash scripts/install-claude-config.sh
 다음을 자동 수행한다:
 
 - `~/.claude/skills/capture-idea` → `<repo>/configs/skills/capture-idea/` 심볼릭 링크
-- `~/.claude/rules/capture-ideas.md` → `<repo>/configs/rules/capture-ideas.md` 심볼릭 링크
-- `~/.claude/rules/security.md` → 같은 방식
-- `~/.claude/settings.json`의 `hooks.Stop`에 `idea-safety-net.sh` 항목 머지 (기존 hook 보존, 중복 등록 방지)
+- `~/.claude/skills/capture-concept` → 같은 방식
+- `~/.claude/rules/capture-ideas.md`, `capture-concepts.md`, `security.md` → 같은 방식
+- `~/.claude/commands/log-entry.md` → `<repo>/configs/commands/log-entry.md` 심볼릭 링크
+- `~/.claude/settings.json`의 `hooks.Stop`에 `idea-safety-net.sh`, `concept-synthesis.sh` 항목 머지 (기존 보존, 중복 방지)
+- **`~/.claude/learning-vault.path`에 이 레포 절대경로 한 줄 기록** — skill/hook이 이를 읽어 cwd 무관하게 항상 같은 vault에 저장
 
 ### 적용 범위 옵션
 

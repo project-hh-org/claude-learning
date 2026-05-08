@@ -72,7 +72,14 @@ src/
     seeds.js      ← seeds/ 파싱 + starter_prompt 추출
     wikilink.js   ← [[wikilink]] → HTML 변환 유틸
     configs.js    ← configs/ 파싱 (skills 중첩 구조 처리, installPath 노출)
-scripts/          ← 자동 push 워처, launchd 설치, Desktop 셋업
+scripts/
+  bootstrap.sh                  ← 새 기기 1회 셋업 (npm + claude config)
+  install-claude-config.sh      ← Code: skills/rules/commands 심볼릭 링크 + Stop hook + vault 경로 기록
+  setup-claude-desktop.sh       ← chat app: filesystem MCP + Custom Instructions 가이드
+  install-launchd.sh            ← (선택) macOS 자동 push 워처
+  watch-and-push.sh             ← (선택) 변경 감지 + 자동 commit/push
+  setup-git.sh                  ← (niche) iCloud 동기화 등으로 .git 빠진 경우만
+  generate-sitemap.mjs          ← 빌드 시 sitemap.xml 생성
 public/
 TEMPLATE.md       ← entry 작성 템플릿
 CONCEPT_TEMPLATE.md ← concept 작성 템플릿
@@ -260,11 +267,16 @@ SCOPE=project bash scripts/install-claude-config.sh   # <repo>/.claude/...에 (p
 
 각 머신에서 한 번씩 등록이 필요하다. 자세한 절차: [`docs/idea-capture-setup.md`](docs/idea-capture-setup.md)
 
+- **새 기기 1회 셋업 (권장)**:
+  ```bash
+  bash scripts/bootstrap.sh
+  ```
+  → `npm install` + `install-claude-config.sh`를 묶어 실행.
 - **Claude Code (CLI)** + **Claude Code Desktop app**:
   ```bash
   bash scripts/install-claude-config.sh
   ```
-  → `~/.claude/skills/`, `~/.claude/rules/`에 심볼릭 링크 + Stop hook 자동 등록.
+  → `~/.claude/skills/`, `~/.claude/rules/`, `~/.claude/commands/`에 심볼릭 링크 + Stop hook 자동 등록 + **`~/.claude/learning-vault.path`에 이 레포 절대경로 기록 (cwd 무관 중앙집중)**.
 - **Claude Desktop chat app** (claude.ai/download — 별개 제품):
   ```bash
   bash scripts/setup-claude-desktop.sh

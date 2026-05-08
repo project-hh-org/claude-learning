@@ -44,6 +44,18 @@ description: "Use proactively whenever the user has just learned, asked about, o
 - 한글 개념이면 의미 살린 짧은 영문으로 의역 (예: "tmux Wave 패턴" → `tmux-wave-pattern`)
 - 이미 같은 슬러그가 존재하면 → **새로 만들지 말고** 기존 파일을 Read해 보강 (stage 갱신, 본문 추가). 중복 생성 금지
 
+### 저장 vault 결정 — 매 발동마다 반드시 수행
+
+**모든 캡처는 항상 한 곳(`claude-learning` 레포)에 모아야 한다.** 사용자가 어떤 cwd에서 작업 중이든 마찬가지다.
+
+발동 시 가장 먼저:
+
+1. Bash 도구로 `cat $HOME/.claude/learning-vault.path 2>/dev/null` 실행
+2. 출력된 첫 줄이 `<vault-root>` 절대경로 — 모든 저장은 `<vault-root>/concepts/<slug>.md`로
+3. 파일이 없거나 비어있으면 `install-claude-config.sh`가 아직 실행되지 않은 상태 — 이 경우에만 cwd 기준으로 fallback. cwd에 `concepts/` 폴더가 없으면 저장하지 말고 사용자에게 "vault 셋업이 필요하다"고 안내
+
+> Desktop chat app은 `setup-claude-desktop.sh`가 등록한 filesystem MCP의 root가 곧 vault root.
+
 ## 템플릿
 
 ```markdown
