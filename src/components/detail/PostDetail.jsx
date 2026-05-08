@@ -1,8 +1,8 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
-import DetailLayout from './DetailLayout'
-import { StageBadge } from './Badge'
+import DetailLayout from '../layout/DetailLayout'
+import { StageBadge } from '../ui/Badge'
 
 function formatDate(dateStr) {
   const d = new Date(dateStr)

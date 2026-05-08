@@ -2,10 +2,10 @@
 
 import { useState, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
-import ListLayout from './ListLayout'
-import MetaCard from './MetaCard'
-import SearchInput from './SearchInput'
-import { SeedBadge } from './Badge'
+import ListLayout from '../layout/ListLayout'
+import MetaCard from '../ui/MetaCard'
+import SearchInput from '../ui/SearchInput'
+import { SeedBadge } from '../ui/Badge'
 
 export default function SeedList({ seeds }) {
   const router = useRouter()

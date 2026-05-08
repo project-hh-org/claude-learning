@@ -1,5 +1,5 @@
 import { getAllConceptSlugs, getConceptBySlug } from '@/lib/concepts'
-import ConceptDetail from '@/components/ConceptDetail'
+import ConceptDetail from '@/components/detail/ConceptDetail'
 import { notFound } from 'next/navigation'
 
 const SITE_URL = 'https://claude-learning.project-hh.com'

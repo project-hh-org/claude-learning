@@ -1,5 +1,5 @@
 import { getAllIdeas } from '@/lib/ideas'
-import IdeaList from '@/components/IdeaList'
+import IdeaList from '@/components/list/IdeaList'
 
 export const metadata = {
   title: 'Ideas',

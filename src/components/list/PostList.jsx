@@ -2,10 +2,10 @@
 
 import { useState, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
-import ListLayout from './ListLayout'
-import EntryCard from './EntryCard'
-import SearchInput from './SearchInput'
-import TagFilter from './TagFilter'
+import ListLayout from '../layout/ListLayout'
+import EntryCard from '../ui/EntryCard'
+import SearchInput from '../ui/SearchInput'
+import TagFilter from '../ui/TagFilter'
 
 export default function PostList({ posts }) {
   const router = useRouter()

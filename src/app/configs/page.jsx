@@ -1,5 +1,5 @@
 import { getAllConfigs } from '@/lib/configs'
-import ConfigsList from '@/components/ConfigsList'
+import ConfigsList from '@/components/list/ConfigsList'
 
 export const metadata = {
   title: 'Claude Configs',

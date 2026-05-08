@@ -1,6 +1,6 @@
 // Server Component — 개별 포스트 페이지 (SSG)
 import { getAllSlugs, getPostBySlug } from '@/lib/posts'
-import PostDetail from '@/components/PostDetail'
+import PostDetail from '@/components/detail/PostDetail'
 import { notFound } from 'next/navigation'
 
 const SITE_URL = 'https://claude-learning.project-hh.com'

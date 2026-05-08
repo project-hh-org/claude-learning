@@ -1,5 +1,5 @@
 import { getAllConfigSlugs, getConfigBySlug } from '@/lib/configs'
-import ConfigDetail from '@/components/ConfigDetail'
+import ConfigDetail from '@/components/detail/ConfigDetail'
 import { notFound } from 'next/navigation'
 
 export async function generateStaticParams() {

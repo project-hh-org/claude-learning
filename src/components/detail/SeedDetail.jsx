@@ -1,8 +1,8 @@
 'use client'
 
-import DetailLayout from './DetailLayout'
-import CopyButton from './CopyButton'
-import { SeedBadge, StageBadge } from './Badge'
+import DetailLayout from '../layout/DetailLayout'
+import CopyButton from '../ui/CopyButton'
+import { SeedBadge, StageBadge } from '../ui/Badge'
 
 export default function SeedDetail({ seed }) {
   return (
