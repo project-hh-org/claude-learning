@@ -1,8 +1,22 @@
 #!/bin/bash
 # =============================================================
-# Claude Learning Log — Git 초기 설정 스크립트
-# 실행: cd ~/Library/Mobile\ Documents/com~apple~CloudDocs/claude/learn
-#       bash scripts/setup-git.sh
+# Claude Learning Log — Git 초기 설정 (1회용 부트스트랩, niche)
+#
+# ⚠️ 주의: 새 기기 셋업의 정석 흐름은 다음이다 — 이 스크립트가 아니라:
+#
+#     git clone https://github.com/project-hh-org/claude-learning.git
+#     cd claude-learning
+#     bash scripts/bootstrap.sh
+#
+# 이 스크립트는 다음 좁은 케이스에서만 의미가 있다:
+#   - iCloud Drive로 폴더만 동기화되어 .git이 빠진 상태
+#   - Zip 다운로드 등으로 git 히스토리 없이 받은 상태
+#
+# 실행:
+#   cd <claude-learning 폴더>
+#   bash scripts/setup-git.sh
+#
+# 동작: git init → 리모트 등록 → 첫 커밋 → push -u origin main
 # =============================================================
 
 set -e

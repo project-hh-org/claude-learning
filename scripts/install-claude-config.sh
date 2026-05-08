@@ -43,6 +43,7 @@ case "$SCOPE" in
 esac
 
 SETTINGS_FILE="$TARGET_BASE/settings.json"
+VAULT_PATH_FILE="$TARGET_BASE/learning-vault.path"
 HOOK_SCRIPTS=(
   "$REPO_ROOT/configs/hooks/idea-safety-net.sh"
   "$REPO_ROOT/configs/hooks/concept-synthesis.sh"
@@ -56,6 +57,7 @@ if [ "${1:-}" = "--uninstall" ]; then
   rm -f "$TARGET_BASE/rules/capture-concepts.md" 2>/dev/null || true
   rm -f "$TARGET_BASE/rules/security.md" 2>/dev/null || true
   rm -f "$TARGET_BASE/commands/log-entry.md" 2>/dev/null || true
+  rm -f "$VAULT_PATH_FILE" 2>/dev/null || true
   ok "심볼릭 링크 제거 완료 ($TARGET_BASE)"
   warn "settings.json의 Stop hook 항목은 수동으로 제거하세요: $SETTINGS_FILE"
   exit 0
@@ -68,6 +70,15 @@ if ! command -v node &>/dev/null; then
 fi
 
 mkdir -p "$TARGET_BASE/skills" "$TARGET_BASE/rules" "$TARGET_BASE/commands"
+
+# ── Vault 절대경로 기록 ─────────────────────────────────────
+# 다른 프로젝트(cwd)에서 Claude Code/Desktop 작업 시에도 캡처된
+# 발상/개념이 항상 이 claude-learning 레포로 모이도록, 절대경로를
+# learning-vault.path 파일에 한 줄로 기록한다. skills/hooks가 이를
+# 참조해 cwd와 무관하게 동일 vault에 쓴다.
+echo "$REPO_ROOT" > "$VAULT_PATH_FILE"
+ok "vault 경로 기록: $VAULT_PATH_FILE  →  $REPO_ROOT"
+
 
 echo "📁 설치 범위: $SCOPE  →  $TARGET_BASE"
 echo ""

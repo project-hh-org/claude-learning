@@ -41,9 +41,17 @@ description: "Use proactively whenever, during thinking, an ideation moment aris
 - 슬러그는 영문 소문자 + 숫자 + 하이픈만 (한글이면 의미 살린 짧은 영문으로 의역)
 - 같은 날 동일 슬러그가 이미 존재하면 뒤에 `-2`, `-3`을 붙여 충돌 방지
 
-저장 위치 (절대 경로 예):
-- Claude Code: `<repo-root>/ideas/...` 또는 `<repo-root>/seeds/...` — 보통 현재 cwd 기준
-- Claude Desktop: `~/claude-learning/ideas/...` 또는 `~/claude-learning/seeds/...` (사용자 환경에 따라 셋업 스크립트가 알려준 경로 사용)
+### 저장 vault 결정 — 매 발동마다 반드시 수행
+
+**모든 캡처는 항상 한 곳(`claude-learning` 레포)에 모아야 한다.** 사용자가 어떤 cwd에서 작업 중이든 마찬가지다.
+
+발동 시 가장 먼저:
+
+1. Bash 도구로 `cat $HOME/.claude/learning-vault.path 2>/dev/null` 실행
+2. 출력된 첫 줄이 `<vault-root>` 절대경로 — 모든 저장은 `<vault-root>/ideas/...` 또는 `<vault-root>/seeds/...`로
+3. 파일이 없거나 비어있으면 `install-claude-config.sh`가 아직 실행되지 않은 상태 — 이 경우에만 cwd 기준 (`<cwd>/ideas/...`)으로 fallback. 단 cwd에 `ideas/` 폴더가 없으면 저장하지 말고 사용자에게 "vault 셋업이 필요하다"고 안내
+
+> Desktop chat app은 `setup-claude-desktop.sh`가 등록한 filesystem MCP의 root가 곧 vault root이므로 별도 path 조회 없이 그 root를 그대로 사용.
 
 ---
 
