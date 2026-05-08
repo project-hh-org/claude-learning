@@ -2,21 +2,26 @@
 # =============================================================
 # setup-claude-desktop.sh
 #
-# Claude Desktop에서 아이디어 자동 캡처가 동작하도록 1회 셋업.
+# ⚠️ 이 스크립트는 claude.ai/download 에서 받는 일반 "Claude Desktop
+#    chat app" 전용이다. Claude Code (CLI)나 Claude Code Desktop app은
+#    Skills/Hooks를 직접 지원하므로 그쪽은 다음을 사용하라:
+#
+#       bash scripts/install-claude-config.sh
+#
+#    이 스크립트는 chat app이 Skills/Hooks를 동일하게 지원한다는 보장이
+#    없으므로 MCP + Custom Instructions 조합으로 우회 활성화한다.
 #
 # 무엇을 하는가:
 #   1) 공식 filesystem MCP 서버를 Desktop config에 등록
-#      (Claude Desktop이 ~/claude-learning/ 이하에 파일을 쓸 수 있도록)
-#   2) capture-ideas 룰의 안내문을 사용자 system prompt(가이드)
-#      문서로 ~/.claude-learning-desktop-guide.md 에 박아 두고
-#      터미널에 그 내용을 띄움 — Desktop의 'Custom instructions'에
-#      복붙하라는 안내.
+#      (Desktop이 ~/claude-learning/ 이하에 파일을 쓸 수 있도록)
+#   2) capture-ideas 룰의 안내문을 ~/.claude-learning-desktop-guide.md 에
+#      작성 — Desktop의 'Custom Instructions'에 사용자가 직접 복붙
 #
 # 실행: bash scripts/setup-claude-desktop.sh
 #
 # 전제:
-#   - Claude Desktop 설치되어 있을 것 (macOS 기준)
-#   - Node.js가 설치되어 있을 것 (npx 사용을 위해)
+#   - Claude Desktop chat app 설치 (macOS / Linux)
+#   - Node.js + npx 설치
 # =============================================================
 
 set -euo pipefail
