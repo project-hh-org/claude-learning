@@ -36,6 +36,11 @@
   gap: 48px;
   align-items: start;
 }
+/* Grid item의 implicit min-width: auto(=min-content) 때문에 콘텐츠가
+   wrap 안 되면 셀이 강제 확장되어 viewport 밖으로 넘침 → 명시적
+   min-width: 0으로 차단. main과 sidebar 모두 적용. */
+.page-wrap > main,
+.page-wrap > .sidebar { min-width: 0; }
 .sidebar { position: sticky; top: 80px; }
 
 /* ─── Tab Bar (sticky 바로 아래) ─── */
