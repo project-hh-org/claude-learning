@@ -3,13 +3,7 @@
 import { useState, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import ListLayout from './ListLayout'
-
-function formatDate(dateStr) {
-  const d = new Date(dateStr)
-  const day = String(d.getDate()).padStart(2, '0')
-  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
-  return { day, month: months[d.getMonth()], year: d.getFullYear() }
-}
+import EntryCard from './EntryCard'
 
 export default function PostList({ posts }) {
   const router = useRouter()
@@ -73,7 +67,7 @@ export default function PostList({ posts }) {
         <div className="s-note">
           새로운 것을 배웠다면 Claude에게:<br />
           <em>&quot;오늘 [주제] 배웠어, 러닝 로그에 추가해줘&quot;</em><br /><br />
-          <code style={{ fontSize: 11, background: 'var(--surface2)', padding: '1px 5px', borderRadius: 4, color: 'var(--accent)' }}>entries/</code>에 .md 저장 → 자동 push → S3 배포
+          <code className="s-inline-code">entries/</code>에 .md 저장 → 자동 push → S3 배포
         </div>
       </div>
       <div className="s-card">
@@ -125,33 +119,16 @@ export default function PostList({ posts }) {
         byYear.map(([year, yearPosts]) => (
           <div key={year} className="year-group">
             <div className="year-label">{year}</div>
-            {yearPosts.map(post => {
-              const { day, month } = formatDate(post.date)
-              return (
-                <div
-                  key={post.slug}
-                  className="post-card"
-                  onClick={() => router.push(`/${post.slug}`)}
-                  role="link"
-                  tabIndex={0}
-                  onKeyDown={e => e.key === 'Enter' && router.push(`/${post.slug}`)}
-                >
-                  <div className="pc-date">
-                    <div className="pc-day">{day}</div>
-                    <div className="pc-month">{month}</div>
-                  </div>
-                  <div className="pc-body">
-                    <div className="pc-title">{post.title}</div>
-                    <div className="pc-summary">{post.summary}</div>
-                    <div className="pc-footer">
-                      {post.tags?.map(tag => (
-                        <span key={tag} className="pc-tag">{tag}</span>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              )
-            })}
+            {yearPosts.map(post => (
+              <EntryCard
+                key={post.slug}
+                date={post.date}
+                title={post.title}
+                summary={post.summary}
+                tags={post.tags}
+                onClick={() => router.push(`/${post.slug}`)}
+              />
+            ))}
           </div>
         ))
       )}

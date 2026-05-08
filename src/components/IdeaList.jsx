@@ -3,11 +3,8 @@
 import { useState, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import ListLayout from './ListLayout'
-
-const KIND_META = {
-  spark:     { label: 'Spark',     emoji: '💭', color: 'blue' },
-  buildable: { label: 'Buildable', emoji: '🔨', color: 'orange' },
-}
+import MetaCard from './MetaCard'
+import { KindBadge } from './Badge'
 
 export default function IdeaList({ ideas }) {
   const router = useRouter()
@@ -71,12 +68,7 @@ export default function IdeaList({ ideas }) {
         <h3>🌱 별개 프로젝트</h3>
         <div className="s-note">
           현재 프로젝트와 무관한 새 프로젝트 아이디어는 별도로 관리됩니다.<br />
-          <button
-            onClick={() => router.push('/seeds')}
-            style={{ marginTop: 8, color: 'var(--accent)', background: 'transparent', border: 'none', cursor: 'pointer', padding: 0, font: 'inherit' }}
-          >
-            → Seeds 보기
-          </button>
+          <button className="link-btn" onClick={() => router.push('/seeds')}>→ Seeds 보기</button>
         </div>
       </div>
     </>
@@ -124,35 +116,17 @@ export default function IdeaList({ ideas }) {
         byMonth.map(([ym, items]) => (
           <div key={ym} className="year-group">
             <div className="year-label">{ym}</div>
-            {items.map(idea => {
-              const kind = KIND_META[idea.kind] || KIND_META.spark
-              return (
-                <div
-                  key={idea.slug}
-                  className="post-card cfg-card"
-                  onClick={() => router.push(`/ideas/${idea.slug}`)}
-                  role="link"
-                  tabIndex={0}
-                  onKeyDown={e => e.key === 'Enter' && router.push(`/ideas/${idea.slug}`)}
-                >
-                  <div className="pc-body">
-                    <div className="pc-title" style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                      <span className={`cfg-badge cfg-badge--${kind.color}`}>
-                        {kind.emoji} {kind.label}
-                      </span>
-                      {idea.title}
-                    </div>
-                    <div className="pc-summary">{idea.excerpt}</div>
-                    <div className="pc-footer">
-                      <span style={{ color: 'var(--muted)', fontSize: 12 }}>{idea.date}</span>
-                      {idea.tags?.map(tag => (
-                        <span key={tag} className="pc-tag">{tag}</span>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              )
-            })}
+            {items.map(idea => (
+              <MetaCard
+                key={idea.slug}
+                badge={<KindBadge kind={idea.kind} />}
+                title={idea.title}
+                summary={idea.excerpt}
+                tags={idea.tags}
+                footerExtras={<span className="meta-date">{idea.date}</span>}
+                onClick={() => router.push(`/ideas/${idea.slug}`)}
+              />
+            ))}
           </div>
         ))
       )}
