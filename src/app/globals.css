@@ -584,3 +584,78 @@ a { color: inherit; text-decoration: none; }
   .tags-label { display: none; }
   .tag-btn { flex-shrink: 0; padding: 4px 10px; font-size: 11px; }
 }
+
+/* ─────────────────────────────────────────────────────────
+   Atoms — 인라인 스타일 제거를 위해 추출한 보조 클래스
+   ────────────────────────────────────────────────────────── */
+.s-inline-code {
+  font-size: 11px;
+  background: var(--surface2);
+  padding: 1px 5px;
+  border-radius: 4px;
+  color: var(--accent);
+}
+
+.link-btn {
+  margin-top: 8px;
+  color: var(--accent);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  font: inherit;
+}
+.link-btn:hover { text-decoration: underline; }
+
+.meta-date  { color: var(--muted); font-size: 12px; }
+.meta-origin{ color: var(--muted); font-size: 11px; }
+
+.year-label--cap { text-transform: capitalize; }
+
+.pc-title--with-badge {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+/* ─── Seed Detail starter-prompt CTA ─── */
+.post-pitch {
+  font-size: 16px;
+  color: var(--muted);
+  line-height: 1.6;
+  margin-top: 12px;
+}
+.seed-starter-cta {
+  margin-top: 24px;
+  padding: 16px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+.seed-starter-title { font-weight: 600; margin-bottom: 4px; }
+.seed-starter-desc  { color: var(--muted); font-size: 13px; }
+.seed-starter-btn {
+  padding: 8px 16px;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 14px;
+  white-space: nowrap;
+  font-family: inherit;
+  transition: background 0.15s;
+}
+.seed-starter-btn:hover { background: var(--accent2); }
+.seed-starter-btn.is-copied { background: var(--green); }
+
+@media (max-width: 740px) {
+  .seed-starter-cta { flex-direction: column; align-items: stretch; }
+  .seed-starter-btn { width: 100%; }
+}
