@@ -1,28 +1,10 @@
 'use client'
 
-import { useState } from 'react'
 import DetailLayout from './DetailLayout'
+import CopyButton from './CopyButton'
 import { SeedBadge, StageBadge } from './Badge'
 
 export default function SeedDetail({ seed }) {
-  const [copied, setCopied] = useState(false)
-
-  async function copyStarterPrompt() {
-    if (!seed.starterPrompt) return
-    try {
-      await navigator.clipboard.writeText(seed.starterPrompt)
-    } catch {
-      const ta = document.createElement('textarea')
-      ta.value = seed.starterPrompt
-      document.body.appendChild(ta)
-      ta.select()
-      document.execCommand('copy')
-      document.body.removeChild(ta)
-    }
-    setCopied(true)
-    setTimeout(() => setCopied(false), 1800)
-  }
-
   return (
     <DetailLayout backTo="/seeds" backLabel="Seeds">
       <div className="post-meta">
@@ -52,12 +34,12 @@ export default function SeedDetail({ seed }) {
               Starter prompt를 복사해 새 Claude 세션에 붙여넣으세요.
             </div>
           </div>
-          <button
-            onClick={copyStarterPrompt}
-            className={`seed-starter-btn ${copied ? 'is-copied' : ''}`}
-          >
-            {copied ? '✓ 복사됨' : '📋 프롬프트 복사'}
-          </button>
+          <CopyButton
+            text={seed.starterPrompt}
+            label="📋 프롬프트 복사"
+            copiedLabel="✓ 복사됨"
+            className="copy-btn--primary"
+          />
         </div>
       )}
 
