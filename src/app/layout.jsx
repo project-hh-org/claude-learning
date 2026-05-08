@@ -4,6 +4,12 @@ const SITE_URL = 'https://claude-learning.project-hh.com'
 const SITE_NAME = '다희의 Learning Log'
 const SITE_DESCRIPTION = '개발하면서 배운 것들 — Claude, TypeScript, 자동화, 생산성 도구'
 
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 5,
+}
+
 export const metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
