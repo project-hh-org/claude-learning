@@ -4,6 +4,7 @@ import { useState, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import ListLayout from './ListLayout'
 import MetaCard from './MetaCard'
+import SearchInput from './SearchInput'
 import { SeedBadge } from './Badge'
 
 export default function SeedList({ seeds }) {
@@ -59,12 +60,10 @@ export default function SeedList({ seeds }) {
       sidebar={sidebar}
     >
       <div className="controls">
-        <input
-          className="search-input"
-          type="text"
-          placeholder="🔍 제목, 피치, 태그 검색..."
+        <SearchInput
           value={query}
-          onChange={e => setQuery(e.target.value)}
+          onChange={setQuery}
+          placeholder="🔍 제목, 피치, 태그 검색..."
         />
       </div>
 
