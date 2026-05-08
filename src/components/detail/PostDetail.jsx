@@ -3,7 +3,11 @@
 import { useRouter } from 'next/navigation'
 import DetailLayout from '../layout/DetailLayout'
 import { StageBadge } from '../ui/Badge'
-import Tag from '../ui/Tag'
+import DetailMeta from '../ui/DetailMeta'
+import DetailTitle from '../ui/DetailTitle'
+import DetailSummary from '../ui/DetailSummary'
+import DetailTags from '../ui/DetailTags'
+import DetailBody from '../ui/DetailBody'
 
 function formatDate(dateStr) {
   const d = new Date(dateStr)
@@ -15,19 +19,14 @@ export default function PostDetail({ post }) {
 
   return (
     <DetailLayout backTo="/" backLabel="전체 목록">
-      <div className="post-meta">
+      <DetailMeta>
         <span>{formatDate(post.date)}</span>
         <StageBadge stage={post.stage} />
-      </div>
+      </DetailMeta>
 
-      <h1 className="post-title">{post.title}</h1>
-      {post.summary && <div className="post-summary">💡 {post.summary}</div>}
-
-      <div className="post-tags">
-        {post.tags?.map(tag => (
-          <Tag variant="accent" key={tag}>{tag}</Tag>
-        ))}
-      </div>
+      <DetailTitle>{post.title}</DetailTitle>
+      <DetailSummary>{post.summary}</DetailSummary>
+      <DetailTags tags={post.tags} />
 
       {post.concepts?.length > 0 && (
         <div className="zettel-concepts">
@@ -62,10 +61,7 @@ export default function PostDetail({ post }) {
 
       <hr className="post-divider" />
 
-      <div
-        className="post-body"
-        dangerouslySetInnerHTML={{ __html: post.contentHtml }}
-      />
+      <DetailBody html={post.contentHtml} />
 
       {post.references?.length > 0 && (
         <div className="post-references">

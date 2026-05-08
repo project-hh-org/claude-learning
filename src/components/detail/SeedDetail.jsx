@@ -2,30 +2,29 @@
 
 import DetailLayout from '../layout/DetailLayout'
 import CopyButton from '../ui/CopyButton'
-import Tag from '../ui/Tag'
 import { SeedBadge, StageBadge } from '../ui/Badge'
+import DetailMeta from '../ui/DetailMeta'
+import DetailTitle from '../ui/DetailTitle'
+import DetailTags from '../ui/DetailTags'
+import DetailBody from '../ui/DetailBody'
 
 export default function SeedDetail({ seed }) {
   return (
     <DetailLayout backTo="/seeds" backLabel="Seeds">
-      <div className="post-meta">
+      <DetailMeta>
         <SeedBadge />
         <StageBadge stage={seed.stage} />
         <span className="meta-date">{seed.date}</span>
         {seed.origin_session_project && (
           <span className="meta-origin">from {seed.origin_session_project}</span>
         )}
-      </div>
+      </DetailMeta>
 
-      <h1 className="post-title">{seed.title}</h1>
+      <DetailTitle>{seed.title}</DetailTitle>
 
       {seed.pitch && <p className="post-pitch">{seed.pitch}</p>}
 
-      <div className="post-tags">
-        {seed.tags?.map(tag => (
-          <Tag variant="accent" key={tag}>{tag}</Tag>
-        ))}
-      </div>
+      <DetailTags tags={seed.tags} />
 
       {seed.starterPrompt && (
         <div className="seed-starter-cta">
@@ -46,10 +45,7 @@ export default function SeedDetail({ seed }) {
 
       <hr className="post-divider" />
 
-      <div
-        className="post-body"
-        dangerouslySetInnerHTML={{ __html: seed.contentHtml }}
-      />
+      <DetailBody html={seed.contentHtml} />
     </DetailLayout>
   )
 }
