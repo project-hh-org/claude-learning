@@ -4,6 +4,8 @@ import { useState, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import ListLayout from './ListLayout'
 import MetaCard from './MetaCard'
+import SearchInput from './SearchInput'
+import TagFilter from './TagFilter'
 import { KindBadge } from './Badge'
 
 export default function IdeaList({ ideas }) {
@@ -80,34 +82,21 @@ export default function IdeaList({ ideas }) {
       sidebar={sidebar}
     >
       <div className="controls">
-        <input
-          className="search-input"
-          type="text"
-          placeholder="🔍 제목, 본문, 태그 검색..."
+        <SearchInput
           value={query}
-          onChange={e => setQuery(e.target.value)}
+          onChange={setQuery}
+          placeholder="🔍 제목, 본문, 태그 검색..."
         />
-        <div className="tags-row">
-          <span className="tags-label">종류</span>
-          <button
-            className={`tag-btn ${activeKind === 'all' ? 'active' : ''}`}
-            onClick={() => setActiveKind('all')}
-          >
-            전체 ({counts.all})
-          </button>
-          <button
-            className={`tag-btn ${activeKind === 'spark' ? 'active' : ''}`}
-            onClick={() => setActiveKind('spark')}
-          >
-            💭 Spark ({counts.spark})
-          </button>
-          <button
-            className={`tag-btn ${activeKind === 'buildable' ? 'active' : ''}`}
-            onClick={() => setActiveKind('buildable')}
-          >
-            🔨 Buildable ({counts.buildable})
-          </button>
-        </div>
+        <TagFilter
+          label="종류"
+          options={[
+            { value: 'all',       label: `전체 (${counts.all})` },
+            { value: 'spark',     label: `💭 Spark (${counts.spark})` },
+            { value: 'buildable', label: `🔨 Buildable (${counts.buildable})` },
+          ]}
+          active={activeKind}
+          onSelect={setActiveKind}
+        />
       </div>
 
       {byMonth.length === 0 ? (

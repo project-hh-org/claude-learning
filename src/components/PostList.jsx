@@ -4,6 +4,8 @@ import { useState, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import ListLayout from './ListLayout'
 import EntryCard from './EntryCard'
+import SearchInput from './SearchInput'
+import TagFilter from './TagFilter'
 
 export default function PostList({ posts }) {
   const router = useRouter()
@@ -86,31 +88,20 @@ export default function PostList({ posts }) {
       sidebar={sidebar}
     >
       <div className="controls">
-        <input
-          className="search-input"
-          type="text"
-          placeholder="🔍 제목, 내용, 태그 검색..."
+        <SearchInput
           value={query}
-          onChange={e => setQuery(e.target.value)}
+          onChange={setQuery}
+          placeholder="🔍 제목, 내용, 태그 검색..."
         />
-        <div className="tags-row">
-          <span className="tags-label">태그</span>
-          <button
-            className={`tag-btn ${activeTag === 'all' ? 'active' : ''}`}
-            onClick={() => setActiveTag('all')}
-          >
-            전체
-          </button>
-          {allTags.map(tag => (
-            <button
-              key={tag}
-              className={`tag-btn ${activeTag === tag ? 'active' : ''}`}
-              onClick={() => setActiveTag(tag)}
-            >
-              {tag}
-            </button>
-          ))}
-        </div>
+        <TagFilter
+          label="태그"
+          options={[
+            { value: 'all', label: '전체' },
+            ...allTags.map(t => ({ value: t, label: t })),
+          ]}
+          active={activeTag}
+          onSelect={setActiveTag}
+        />
       </div>
 
       {byYear.length === 0 ? (
