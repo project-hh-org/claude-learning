@@ -38,7 +38,13 @@ JSONL="$HOME/.claude/projects/${ENCODED_CWD}/${SESSION_ID}.jsonl"
 [ ! -f "$JSONL" ] && exit 0
 
 # ── 이미 capture된 idea 슬러그가 있으면 중복 검사용으로 모음 ────
-REPO_ROOT="$CWD"
+# ── Vault 결정: ~/.claude/learning-vault.path 우선, 없으면 cwd ──
+VAULT_PATH_FILE="$HOME/.claude/learning-vault.path"
+if [ -s "$VAULT_PATH_FILE" ]; then
+  REPO_ROOT="$(head -n1 "$VAULT_PATH_FILE" | tr -d '\r\n')"
+else
+  REPO_ROOT="$CWD"
+fi
 [ -d "$REPO_ROOT/ideas" ] || exit 0
 
 UNSORTED_DIR="$REPO_ROOT/ideas/_unsorted"

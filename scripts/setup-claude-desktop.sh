@@ -34,8 +34,20 @@ err()  { echo -e "${RED}❌ $*${NC}"; }
 
 # ── 경로 결정 ────────────────────────────────────────────
 REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-VAULT_DIR="${VAULT_DIR:-$HOME/claude-learning}"   # Desktop이 파일을 떨굴 루트
 GUIDE_PATH="$HOME/.claude-learning-desktop-guide.md"
+
+# Vault 경로 우선순위:
+#   1) 명시적 VAULT_DIR 환경변수
+#   2) install-claude-config.sh가 기록한 ~/.claude/learning-vault.path
+#   3) ~/claude-learning (기본)
+VAULT_PATH_FILE="$HOME/.claude/learning-vault.path"
+if [ -n "${VAULT_DIR:-}" ]; then
+  :  # 사용자가 명시한 경로 우선
+elif [ -s "$VAULT_PATH_FILE" ]; then
+  VAULT_DIR="$(head -n1 "$VAULT_PATH_FILE" | tr -d '\r\n')"
+else
+  VAULT_DIR="$HOME/claude-learning"
+fi
 
 OS="$(uname -s)"
 case "$OS" in
