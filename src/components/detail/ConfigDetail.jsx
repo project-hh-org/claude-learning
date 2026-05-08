@@ -2,35 +2,29 @@
 
 import DetailLayout from '../layout/DetailLayout'
 import { CategoryBadge } from '../ui/Badge'
-import Tag from '../ui/Tag'
+import DetailMeta from '../ui/DetailMeta'
+import DetailTitle from '../ui/DetailTitle'
+import DetailSummary from '../ui/DetailSummary'
+import DetailTags from '../ui/DetailTags'
+import DetailBody from '../ui/DetailBody'
 
 export default function ConfigDetail({ config }) {
+  const installPath = config.installPath || `~/.claude/${config.category}/${config.slug}.md`
   return (
     <DetailLayout backTo="/configs" backLabel="Configs">
-      <div className="post-meta">
+      <DetailMeta>
         <CategoryBadge category={config.category} />
         <span className="meta-dot">·</span>
-        <span>{config.installPath || `~/.claude/${config.category}/${config.slug}.md`}</span>
-      </div>
+        <span>{installPath}</span>
+      </DetailMeta>
 
-      <h1 className="post-title">{config.title}</h1>
-
-      {config.description && (
-        <div className="post-summary">💡 {config.description}</div>
-      )}
-
-      <div className="post-tags">
-        {config.tags?.map(tag => (
-          <Tag variant="accent" key={tag}>{tag}</Tag>
-        ))}
-      </div>
+      <DetailTitle>{config.title}</DetailTitle>
+      <DetailSummary>{config.description}</DetailSummary>
+      <DetailTags tags={config.tags} />
 
       <hr className="post-divider" />
 
-      <div
-        className="post-body"
-        dangerouslySetInnerHTML={{ __html: config.contentHtml }}
-      />
+      <DetailBody html={config.contentHtml} />
     </DetailLayout>
   )
 }

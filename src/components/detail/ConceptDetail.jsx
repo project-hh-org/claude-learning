@@ -3,35 +3,30 @@
 import { useRouter } from 'next/navigation'
 import DetailLayout from '../layout/DetailLayout'
 import { StageBadge } from '../ui/Badge'
-import Tag from '../ui/Tag'
+import DetailMeta from '../ui/DetailMeta'
+import DetailTitle from '../ui/DetailTitle'
+import DetailTags from '../ui/DetailTags'
+import DetailBody from '../ui/DetailBody'
 
 export default function ConceptDetail({ concept }) {
   const router = useRouter()
 
   return (
     <DetailLayout backTo="/" backLabel="전체 목록">
-      <div className="post-meta">
+      <DetailMeta>
         <span className="concept-type-badge">◈ 개념 노트</span>
         <StageBadge stage={concept.stage} />
         {concept.updated && (
           <span className="meta-date">최종 수정 {concept.updated}</span>
         )}
-      </div>
+      </DetailMeta>
 
-      <h1 className="post-title">{concept.title}</h1>
-
-      <div className="post-tags">
-        {concept.tags?.map(tag => (
-          <Tag variant="accent" key={tag}>{tag}</Tag>
-        ))}
-      </div>
+      <DetailTitle>{concept.title}</DetailTitle>
+      <DetailTags tags={concept.tags} />
 
       <hr className="post-divider" />
 
-      <div
-        className="post-body"
-        dangerouslySetInnerHTML={{ __html: concept.contentHtml }}
-      />
+      <DetailBody html={concept.contentHtml} />
 
       {concept.related?.length > 0 && (
         <div className="zettel-section">
