@@ -11,9 +11,15 @@
  *     onClick={() => ...}
  *   />
  *
+ * Card / CardBody / CardTitle / CardSummary / CardFooter atom을 조립.
  * footerExtras: tags 앞에 추가로 렌더할 노드 (날짜, 경로, 출처 등)
  * tags: 배열로 받으면 Tag atom으로 자동 렌더
  */
+import Card from './Card'
+import CardBody from './CardBody'
+import CardTitle from './CardTitle'
+import CardSummary from './CardSummary'
+import CardFooter from './CardFooter'
 import Tag from './Tag'
 
 export default function MetaCard({
@@ -24,29 +30,21 @@ export default function MetaCard({
   footerExtras = null,
   onClick,
 }) {
+  const showFooter = footerExtras || tags.length > 0
   return (
-    <div
-      className="post-card cfg-card"
-      onClick={onClick}
-      role="link"
-      tabIndex={0}
-      onKeyDown={e => e.key === 'Enter' && onClick?.()}
-    >
-      <div className="pc-body">
-        <div className="pc-title pc-title--with-badge">
-          {badge}
-          {title}
-        </div>
-        {summary && <div className="pc-summary">{summary}</div>}
-        {(footerExtras || tags.length > 0) && (
-          <div className="pc-footer">
+    <Card variant="cfg" onClick={onClick}>
+      <CardBody>
+        <CardTitle badge={badge}>{title}</CardTitle>
+        <CardSummary>{summary}</CardSummary>
+        {showFooter && (
+          <CardFooter>
             {footerExtras}
             {tags.map(tag => (
               <Tag key={tag}>{tag}</Tag>
             ))}
-          </div>
+          </CardFooter>
         )}
-      </div>
-    </div>
+      </CardBody>
+    </Card>
   )
 }
