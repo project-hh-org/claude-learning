@@ -55,6 +55,7 @@ if [ "${1:-}" = "--uninstall" ]; then
   rm -f "$TARGET_BASE/rules/capture-ideas.md" 2>/dev/null || true
   rm -f "$TARGET_BASE/rules/capture-concepts.md" 2>/dev/null || true
   rm -f "$TARGET_BASE/rules/security.md" 2>/dev/null || true
+  rm -f "$TARGET_BASE/commands/log-entry.md" 2>/dev/null || true
   ok "심볼릭 링크 제거 완료 ($TARGET_BASE)"
   warn "settings.json의 Stop hook 항목은 수동으로 제거하세요: $SETTINGS_FILE"
   exit 0
@@ -66,7 +67,7 @@ if ! command -v node &>/dev/null; then
   exit 1
 fi
 
-mkdir -p "$TARGET_BASE/skills" "$TARGET_BASE/rules"
+mkdir -p "$TARGET_BASE/skills" "$TARGET_BASE/rules" "$TARGET_BASE/commands"
 
 echo "📁 설치 범위: $SCOPE  →  $TARGET_BASE"
 echo ""
@@ -101,6 +102,22 @@ if [ -d "$RULES_SRC" ]; then
     fi
     ln -s "$rule_file" "$target"
     ok "rule 등록: $target  →  $rule_file"
+  done
+fi
+
+# ── Commands 심볼릭 링크 (slash commands) ─────────────────
+COMMANDS_SRC="$REPO_ROOT/configs/commands"
+if [ -d "$COMMANDS_SRC" ]; then
+  for cmd_file in "$COMMANDS_SRC"/*.md; do
+    [ -f "$cmd_file" ] || continue
+    name="$(basename "$cmd_file")"
+
+    target="$TARGET_BASE/commands/$name"
+    if [ -L "$target" ] || [ -e "$target" ]; then
+      rm -f "$target"
+    fi
+    ln -s "$cmd_file" "$target"
+    ok "command 등록: $target  →  $cmd_file"
   done
 fi
 
