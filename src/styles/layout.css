@@ -54,7 +54,11 @@
   position: sticky;
   top: var(--h-header);
   z-index: 99;
+  /* 가로 스크롤만 허용. overflow-x: auto만 두면 브라우저가
+     implicit overflow-y: auto를 걸어서 세로 스크롤도 약하게
+     활성화되는 경우가 있어 명시적으로 hidden 지정 */
   overflow-x: auto;
+  overflow-y: hidden;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
 }
