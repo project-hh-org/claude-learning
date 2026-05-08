@@ -2,6 +2,7 @@
 
 import DetailLayout from '../layout/DetailLayout'
 import CopyButton from '../ui/CopyButton'
+import Tag from '../ui/Tag'
 import { SeedBadge, StageBadge } from '../ui/Badge'
 
 export default function SeedDetail({ seed }) {
@@ -22,7 +23,7 @@ export default function SeedDetail({ seed }) {
 
       <div className="post-tags">
         {seed.tags?.map(tag => (
-          <span key={tag} className="post-tag">{tag}</span>
+          <Tag variant="accent" key={tag}>{tag}</Tag>
         ))}
       </div>
 
