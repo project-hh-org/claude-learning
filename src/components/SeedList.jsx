@@ -3,6 +3,8 @@
 import { useState, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import ListLayout from './ListLayout'
+import MetaCard from './MetaCard'
+import { SeedBadge } from './Badge'
 
 export default function SeedList({ seeds }) {
   const router = useRouter()
@@ -45,12 +47,7 @@ export default function SeedList({ seeds }) {
         <h3>💡 메모 보기</h3>
         <div className="s-note">
           현재 프로젝트 맥락의 메모는 별도로 관리됩니다.<br />
-          <button
-            onClick={() => router.push('/ideas')}
-            style={{ marginTop: 8, color: 'var(--accent)', background: 'transparent', border: 'none', cursor: 'pointer', padding: 0, font: 'inherit' }}
-          >
-            → Ideas 보기
-          </button>
+          <button className="link-btn" onClick={() => router.push('/ideas')}>→ Ideas 보기</button>
         </div>
       </div>
     </>
@@ -76,33 +73,24 @@ export default function SeedList({ seeds }) {
       ) : (
         <div className="year-group">
           {filtered.map(seed => (
-            <div
+            <MetaCard
               key={seed.slug}
-              className="post-card cfg-card"
-              onClick={() => router.push(`/seeds/${seed.slug}`)}
-              role="link"
-              tabIndex={0}
-              onKeyDown={e => e.key === 'Enter' && router.push(`/seeds/${seed.slug}`)}
-            >
-              <div className="pc-body">
-                <div className="pc-title" style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                  <span className="cfg-badge cfg-badge--green">🌱 Seed</span>
-                  {seed.title}
-                </div>
-                <div className="pc-summary">{seed.pitch || '— 한 줄 피치 없음 —'}</div>
-                <div className="pc-footer">
-                  <span style={{ color: 'var(--muted)', fontSize: 12 }}>{seed.date}</span>
+              badge={<SeedBadge />}
+              title={seed.title}
+              summary={seed.pitch || '— 한 줄 피치 없음 —'}
+              tags={seed.tags}
+              footerExtras={
+                <>
+                  <span className="meta-date">{seed.date}</span>
                   {seed.origin_session_project && (
-                    <span style={{ color: 'var(--muted)', fontSize: 11 }}>
+                    <span className="meta-origin">
                       ← {seed.origin_session_project}에서 발상
                     </span>
                   )}
-                  {seed.tags?.map(tag => (
-                    <span key={tag} className="pc-tag">{tag}</span>
-                  ))}
-                </div>
-              </div>
-            </div>
+                </>
+              }
+              onClick={() => router.push(`/seeds/${seed.slug}`)}
+            />
           ))}
         </div>
       )}

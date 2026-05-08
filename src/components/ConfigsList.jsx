@@ -3,6 +3,8 @@
 import { useState, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import ListLayout from './ListLayout'
+import MetaCard from './MetaCard'
+import { CategoryBadge } from './Badge'
 
 const CATEGORY_ORDER = ['rules', 'hooks', 'commands', 'skills']
 
@@ -50,7 +52,7 @@ export default function ConfigsList({ configs }) {
         <div className="s-note">
           새 rule/hook/command/skill을 만들었다면:<br />
           <em>&quot;이 내용 configs에 추가해줘&quot;</em><br /><br />
-          <code style={{ fontSize: 11, background: 'var(--surface2)', padding: '1px 5px', borderRadius: 4, color: 'var(--accent)' }}>configs/</code> 하위에 저장 → 자동 배포
+          <code className="s-inline-code">configs/</code> 하위에 저장 → 자동 배포
         </div>
       </div>
       <div className="s-card">
@@ -80,32 +82,23 @@ export default function ConfigsList({ configs }) {
       ) : (
         byCategory.map(([category, items]) => (
           <div key={category} className="year-group">
-            <div className="year-label" style={{ textTransform: 'capitalize' }}>
+            <div className="year-label year-label--cap">
               {items[0]?.emoji} {category}
             </div>
             {items.map(cfg => (
-              <div
+              <MetaCard
                 key={`${cfg.category}/${cfg.slug}`}
-                className="post-card cfg-card"
+                badge={<CategoryBadge category={cfg.category} />}
+                title={cfg.title}
+                summary={cfg.description}
+                tags={cfg.tags}
+                footerExtras={
+                  <span className="cfg-path">
+                    {cfg.installPath || `~/.claude/${cfg.category}/${cfg.slug}.md`}
+                  </span>
+                }
                 onClick={() => router.push(`/configs/${cfg.category}/${cfg.slug}`)}
-                role="link"
-                tabIndex={0}
-                onKeyDown={e => e.key === 'Enter' && router.push(`/configs/${cfg.category}/${cfg.slug}`)}
-              >
-                <div className="pc-body">
-                  <div className="pc-title" style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                    <span className={`cfg-badge cfg-badge--${cfg.color}`}>{cfg.label}</span>
-                    {cfg.title}
-                  </div>
-                  <div className="pc-summary">{cfg.description}</div>
-                  <div className="pc-footer">
-                    <span className="cfg-path">{cfg.installPath || `~/.claude/${cfg.category}/${cfg.slug}.md`}</span>
-                    {cfg.tags?.map(tag => (
-                      <span key={tag} className="pc-tag">{tag}</span>
-                    ))}
-                  </div>
-                </div>
-              </div>
+              />
             ))}
           </div>
         ))

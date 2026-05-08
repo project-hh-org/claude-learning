@@ -3,6 +3,16 @@
 다희의 개발 학습 로그 블로그. Next.js SSG + AWS S3/CloudFront로 배포됨.
 URL: https://claude-learning.project-hh.com
 
+## 컴포넌트 컨벤션
+
+3계층 구조(`layout/` · `ui/` · `list/`+`detail/`)로 entity별 페이지를 조립한다. atom 단위 primitive(`Badge`, `EntryCard`, `MetaCard`)를 공유해 페이지마다 스타일이 갈라지는 것을 막는다.
+
+자세한 가이드: [`docs/component-conventions.md`](docs/component-conventions.md)
+
+새 entity(예: `/blogs`)를 추가할 때는 그 문서의 **"새 entity 추가 시"** 절차를 따른다 — 기존 atom을 수정하지 않고 추가만으로 끝나야 한다.
+
+---
+
 ## 라우트 / 네비게이션
 
 `src/components/TabNav.jsx`가 모든 인덱스 페이지에서 공유되는 단일 탭 네비게이션이다.
