@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
+import TabNav from './TabNav'
 
 const KIND_META = {
   spark:     { label: 'Spark',     emoji: '💭', color: 'blue' },
@@ -58,11 +59,7 @@ export default function IdeaList({ ideas }) {
         </div>
       </header>
 
-      <div className="tab-bar">
-        <button className="tab-btn" onClick={() => router.push('/')}>📚 Learning Log</button>
-        <button className="tab-btn active">💡 Ideas <span className="tab-count">{ideas.length}</span></button>
-        <button className="tab-btn" onClick={() => router.push('/seeds')}>🌱 Seeds</button>
-      </div>
+      <TabNav />
 
       <div className="page-wrap">
         <main>

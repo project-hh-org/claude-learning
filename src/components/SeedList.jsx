@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
+import TabNav from './TabNav'
 
 export default function SeedList({ seeds }) {
   const router = useRouter()
@@ -34,11 +35,7 @@ export default function SeedList({ seeds }) {
         </div>
       </header>
 
-      <div className="tab-bar">
-        <button className="tab-btn" onClick={() => router.push('/')}>📚 Learning Log</button>
-        <button className="tab-btn" onClick={() => router.push('/ideas')}>💡 Ideas</button>
-        <button className="tab-btn active">🌱 Seeds <span className="tab-count">{seeds.length}</span></button>
-      </div>
+      <TabNav />
 
       <div className="page-wrap">
         <main>
