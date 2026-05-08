@@ -181,29 +181,40 @@ SCOPE=project bash scripts/install-claude-config.sh   # <repo>/.claude/...에 (p
 
 ---
 
-## 아이디어 자동 캡처 (Ideas / Seeds)
+## 자동 캡처 파이프라인 (Ideas / Seeds / Concepts)
 
-thinking 중 떠오른 발상이 휘발되지 않도록 즉시 마크다운으로 저장하는 파이프라인.
+대화 중 휘발되기 쉬운 정보를 즉시 마크다운으로 저장. 세 영역으로 분리:
 
-### 두 갈래
+| 분류 | 폴더 | 무엇을 | 트리거 |
+|---|---|---|---|
+| 현재 프로젝트 맥락의 메모/생각 | `ideas/` | spark / buildable | thinking에서 발상 — `capture-idea` skill |
+| 완전히 별개의 새 프로젝트 씨앗 | `seeds/` | 한 줄 피치 + 기획 + starter prompt | thinking에서 발상 — `capture-idea` skill |
+| 새로 알게 된 정의/원리/패턴 | `concepts/` | 원자적 영구 노트 (seedling 상태) | 사용자 학습 시그널 — `capture-concept` skill |
 
-| 분류 | 폴더 | 무엇을 |
+판단 기준:
+- "**만들어보면 좋겠다**" → `ideas/` 또는 `seeds/` (실현하려면 새 레포가 필요한가? yes면 seeds)
+- "**X가 뭔지 알았다**" → `concepts/`
+- "**오늘 한 일 회고**" → `entries/` (사용자가 명시 호출 — `/log-entry` 명령은 향후 추가 예정, [`docs/capture-pipeline-todo.md`](docs/capture-pipeline-todo.md) 참조)
+
+세 영역은 서로 겹치지 않는다. 헷갈리면 저장하지 않는다 — 침묵이 노이즈보다 낫다.
+
+### 구성요소 (하이브리드 — 즉시 캡처 + Stop hook 합성)
+
+| 종류 | 파일 | 역할 |
 |---|---|---|
-| 현재 프로젝트 맥락의 메모/생각 | `ideas/` | 짧은 메모 (kind=spark) 또는 적용 아이디어 (kind=buildable) |
-| 완전히 별개의 새 프로젝트 씨앗 | `seeds/` | 한 줄 피치 + 간단 기획 + 새 세션 starter prompt |
+| Skill | `configs/skills/capture-idea/SKILL.md` | thinking 발상 즉시 ideas/·seeds/에 저장 |
+| Skill | `configs/skills/capture-concept/SKILL.md` | 학습 시그널 즉시 concepts/에 seedling 저장 |
+| Rule | `configs/rules/capture-ideas.md` | capture-idea 발동 강제 |
+| Rule | `configs/rules/capture-concepts.md` | capture-concept 발동 강제 |
+| Stop hook (안전망) | `configs/hooks/idea-safety-net.sh` | 세션 끝에 thinking 후처리 → `ideas/_unsorted/` |
+| Stop hook (합성) | `configs/hooks/concept-synthesis.sh` | 세션 끝에 정의 Q&A 추출 → `concepts/_unsorted/` |
+| Desktop 셋업 | `scripts/setup-claude-desktop.sh` | chat app용 filesystem MCP 등록 |
 
-판단 기준 한 줄: **"이 발상을 실현하려면 새 레포를 파야 하는가?"** → yes면 `seeds/`.
-
-### 구성요소
-
-- 룰: `configs/rules/capture-ideas.md` — 발상 즉시 캡처를 강제
-- 스킬: `configs/skills/capture-idea/SKILL.md` — 트리거 패턴 + 마크다운 템플릿
-- 안전망 hook: `configs/hooks/idea-safety-net.sh` — Stop 시점에 누락분 후처리
-- Desktop 셋업: `scripts/setup-claude-desktop.sh` — 공식 filesystem MCP 1회 등록
+`_unsorted/` 폴더의 후보는 사용자가 검토 후 정식 위치로 옮기거나 삭제한다.
 
 ### 캡처 후 흐름
 
-`ideas/` 또는 `seeds/`에 파일 생성 → 자동 push → S3 배포 → `/ideas`, `/seeds` 페이지에서 열람. seed 페이지의 "📋 프롬프트 복사" 버튼으로 starter prompt를 즉시 새 세션에 사용 가능.
+`ideas/`·`seeds/`·`concepts/`에 파일 생성 → 자동 push → S3 배포 → `/ideas`·`/seeds` 페이지에서 열람 (concept은 기존 `/concept/[slug]` 페이지로 노출). seed 페이지의 "📋 프롬프트 복사" 버튼으로 starter prompt를 즉시 새 세션에 사용 가능.
 
 ### 머신별 1회 셋업
 

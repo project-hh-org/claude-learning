@@ -43,12 +43,17 @@ case "$SCOPE" in
 esac
 
 SETTINGS_FILE="$TARGET_BASE/settings.json"
-HOOK_SCRIPT="$REPO_ROOT/configs/hooks/idea-safety-net.sh"
+HOOK_SCRIPTS=(
+  "$REPO_ROOT/configs/hooks/idea-safety-net.sh"
+  "$REPO_ROOT/configs/hooks/concept-synthesis.sh"
+)
 
 # ── --uninstall ─────────────────────────────────────────────
 if [ "${1:-}" = "--uninstall" ]; then
   rm -f "$TARGET_BASE/skills/capture-idea" 2>/dev/null || true
+  rm -f "$TARGET_BASE/skills/capture-concept" 2>/dev/null || true
   rm -f "$TARGET_BASE/rules/capture-ideas.md" 2>/dev/null || true
+  rm -f "$TARGET_BASE/rules/capture-concepts.md" 2>/dev/null || true
   rm -f "$TARGET_BASE/rules/security.md" 2>/dev/null || true
   ok "심볼릭 링크 제거 완료 ($TARGET_BASE)"
   warn "settings.json의 Stop hook 항목은 수동으로 제거하세요: $SETTINGS_FILE"
@@ -99,8 +104,13 @@ if [ -d "$RULES_SRC" ]; then
   done
 fi
 
-# ── Stop hook을 settings.json에 머지 ─────────────────────────
-if [ -x "$HOOK_SCRIPT" ]; then
+# ── Stop hook들을 settings.json에 머지 ───────────────────────
+for HOOK_SCRIPT in "${HOOK_SCRIPTS[@]}"; do
+  if [ ! -x "$HOOK_SCRIPT" ]; then
+    warn "$HOOK_SCRIPT 실행 권한 없음 — skip (chmod +x 후 재실행)"
+    continue
+  fi
+
   node - "$SETTINGS_FILE" "$HOOK_SCRIPT" <<'NODE'
 const fs = require('fs')
 const path = require('path')
@@ -129,18 +139,16 @@ const already = (cfg.hooks.Stop || []).some(group =>
 )
 
 if (already) {
-  console.log('[install] Stop hook 이미 등록됨 — skip')
+  console.log('[install] 이미 등록됨 — skip: ' + path.basename(hookCommand))
 } else {
   cfg.hooks.Stop.push(desired)
   fs.mkdirSync(path.dirname(settingsPath), { recursive: true })
   fs.writeFileSync(settingsPath, JSON.stringify(cfg, null, 2) + '\n', 'utf-8')
-  console.log('[install] Stop hook 추가됨 → ' + settingsPath)
+  console.log('[install] 추가됨: ' + path.basename(hookCommand) + ' → ' + settingsPath)
 }
 NODE
-  ok "Stop hook 등록 ($SETTINGS_FILE)"
-else
-  warn "$HOOK_SCRIPT 실행 권한 없음 — chmod +x 후 재실행"
-fi
+  ok "Stop hook 등록 검사: $(basename "$HOOK_SCRIPT")"
+done
 
 # ── 마무리 ──────────────────────────────────────────────────
 echo ""
