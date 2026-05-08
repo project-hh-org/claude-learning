@@ -1,5 +1,5 @@
 import { getAllSeeds } from '@/lib/seeds'
-import SeedList from '@/components/SeedList'
+import SeedList from '@/components/list/SeedList'
 
 export const metadata = {
   title: 'Seeds',

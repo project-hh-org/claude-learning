@@ -1,7 +1,7 @@
 'use client'
 
-import DetailLayout from './DetailLayout'
-import { CategoryBadge } from './Badge'
+import DetailLayout from '../layout/DetailLayout'
+import { CategoryBadge } from '../ui/Badge'
 
 export default function ConfigDetail({ config }) {
   return (

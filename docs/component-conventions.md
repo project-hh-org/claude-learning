@@ -28,7 +28,7 @@ src/lib/          ← 데이터 layer (markdown 파싱)
   posts.js, concepts.js, configs.js, ideas.js, seeds.js, wikilink.js
 ```
 
-> 현재(2026-05-08) 시점에는 폴더 분리는 단계 5에서 적용. 그 전까지는 `src/components/`에 평탄하게 두고 명명만 컨벤션을 따른다.
+> ✅ 2026-05-08: 폴더 분리(`layout/`, `ui/`, `list/`, `detail/`) 적용 완료. CSS 정리(globals.css 분리 또는 CSS Modules)는 별도 단계에서 진행.
 
 ## 계층별 책임
 
@@ -87,11 +87,12 @@ src/lib/          ← 데이터 layer (markdown 파싱)
 
 | 단계 | 내용 | 상태 |
 |---|---|---|
-| 1 | `DetailLayout` 추출 (5개 Detail 외곽 통일) | 진행 중 |
-| 2 | `Badge` / `EntryCard` / `MetaCard` atom 추출 | 진행 중 |
-| 3 | `SearchInput` / `TagFilter` atom 추출 | 예정 (별도 PR) |
-| 4 | `CopyButton` 추출 (현재 SeedDetail 인라인) | 예정 (별도 PR) |
-| 5 | 폴더 분리 (`layout/`, `ui/`, `list/`, `detail/`, `sidebar/`) | 예정 (별도 PR) |
+| 1 | `DetailLayout` 추출 (5개 Detail 외곽 통일) | ✅ 완료 |
+| 2 | `Badge` / `EntryCard` / `MetaCard` atom 추출 | ✅ 완료 |
+| 3 | `SearchInput` / `TagFilter` atom 추출 | ✅ 완료 |
+| 4 | `CopyButton` 추출 | ✅ 완료 |
+| 5 | 폴더 분리 (`layout/`, `ui/`, `list/`, `detail/`) | ✅ 완료 |
+| 6 | CSS 정리 (globals.css 주제별 분리 또는 CSS Modules) | 진행 예정 |
 
 각 단계는 독립적이라 PR 단위로 진행한다.
 

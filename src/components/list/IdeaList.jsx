@@ -2,11 +2,11 @@
 
 import { useState, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
-import ListLayout from './ListLayout'
-import MetaCard from './MetaCard'
-import SearchInput from './SearchInput'
-import TagFilter from './TagFilter'
-import { KindBadge } from './Badge'
+import ListLayout from '../layout/ListLayout'
+import MetaCard from '../ui/MetaCard'
+import SearchInput from '../ui/SearchInput'
+import TagFilter from '../ui/TagFilter'
+import { KindBadge } from '../ui/Badge'
 
 export default function IdeaList({ ideas }) {
   const router = useRouter()
