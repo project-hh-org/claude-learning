@@ -11,10 +11,14 @@ tags: ["ideation", "zettelkasten", "automation"]
 
 ## 적용 범위
 
-- Claude Code (built-in Write 도구 사용)
-- Claude Desktop (`filesystem` MCP의 `write_file` 도구 사용 — 사전에 셋업 스크립트로 등록되어 있어야 함)
+| 환경 | 활성화 방법 | 사용하는 도구 |
+|---|---|---|
+| Claude Code (CLI) | `scripts/install-claude-config.sh` 실행 시 `~/.claude/rules/`로 심볼릭 링크되어 자동 로드 | built-in Write |
+| Claude Code Desktop app | 동일 (위 install 스크립트가 양쪽 모두 적용) | built-in Write |
+| Claude Desktop chat app | `scripts/setup-claude-desktop.sh` 실행 후 사용자가 Custom Instructions에 가이드를 직접 복붙 | filesystem MCP의 `write_file` |
+| Claude 모바일앱 | 자동 캡처 불가 — Custom Instructions로 응답에 명시 출력만 가능 | n/a |
 
-저장 루트 경로: `claude-learning` 레포의 작업 디렉토리. Desktop의 경우 보통 `~/claude-learning/`. 환경별 정확한 경로는 셋업 스크립트가 사용자 system prompt에 박아둔다.
+저장 루트 경로: `claude-learning` 레포의 작업 디렉토리. Desktop chat app의 경우 보통 `~/claude-learning/`. 정확한 경로는 셋업 스크립트가 사용자 가이드에 박아둔다.
 
 ## 발동 조건
 

@@ -10,7 +10,7 @@ function formatDate(dateStr) {
   return { day, month: months[d.getMonth()], year: d.getFullYear() }
 }
 
-const CATEGORY_ORDER = ['rules', 'hooks', 'commands']
+const CATEGORY_ORDER = ['rules', 'hooks', 'commands', 'skills']
 
 export default function PostList({ posts, configs = [] }) {
   const router = useRouter()
@@ -215,7 +215,7 @@ export default function PostList({ posts, configs = [] }) {
                         </div>
                         <div className="pc-summary">{cfg.description}</div>
                         <div className="pc-footer">
-                          <span className="cfg-path">~/.claude/{cfg.category}/{cfg.slug}.md</span>
+                          <span className="cfg-path">{cfg.installPath || `~/.claude/${cfg.category}/${cfg.slug}.md`}</span>
                           {cfg.tags?.map(tag => (
                             <span key={tag} className="pc-tag">{tag}</span>
                           ))}
