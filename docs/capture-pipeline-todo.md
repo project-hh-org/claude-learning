@@ -20,18 +20,16 @@
 
 ## 🚧 보류 — 다음 단계 작업
 
-### 1. Entry 초안 슬래시 명령 (`/log-entry`)
+### 1. ✅ Entry 초안 슬래시 명령 (`/log-entry`) — 완료
 
-**왜 자동이 아닌 명령형인가**: `entries/`는 회고적 서사 글이라 자동 저장 시 노이즈/중복/어조 충돌이 심하다. 사용자가 명시적으로 호출하는 시점에만 초안을 만든다.
+`configs/commands/log-entry.md` 신규. 사용자가 `/log-entry` 또는 `/log-entry <주제>`로 호출 시:
+- 세션 thinking/대화/작업 회고 → entries/<YYYY-MM-DD>-<slug>.md 초안 작성
+- frontmatter 자동(title/date/summary/tags/related/concepts)
+- 기존 entries의 1인칭 한국어 서사 어조 모방
+- 사용자에게 먼저 보여주고 검토 → 승인 후 저장
+- **양방향 링크 자동 갱신**: 같은 세션에서 만든 concept들의 `related`에 entry 슬러그 추가 (#3 항목도 이 명령에 임베드되어 함께 완료)
 
-**구현 항목**:
-- `configs/commands/log-entry.md` 슬래시 명령 작성
-  - 발동 조건: 사용자가 "오늘 배운 거 정리해줘", "이 세션 entries에 추가해줘" 등
-  - 동작: 세션의 thinking + 캡처된 concepts/ideas + 작업 흐름을 묶어 frontmatter 완비된 **초안** 제시 → 사용자가 검토/편집 후 저장
-  - 어조: 기존 entries의 개인적 1인칭 한국어 어조 모방
-  - frontmatter 자동 채움: title, date, summary, tags, related, concepts (이번 세션에서 만든 concept 슬러그 자동 링크)
-- `scripts/install-claude-config.sh`에 `configs/commands/*.md` → `~/.claude/commands/*.md` 심볼릭 링크 등록 로직 추가
-- `CLAUDE.md`와 `docs/idea-capture-setup.md` 갱신
+`scripts/install-claude-config.sh`에 `configs/commands/*.md` → `~/.claude/commands/*.md` 심볼릭 링크 로직 추가. `--uninstall`도 정리.
 
 ### 2. 통합된 3-way 분류 룰
 
@@ -48,7 +46,7 @@ thinking에서 "발상"이 떠오름        → capture-idea (ideas/ 또는 seed
 ### 3. 캡처 결과 후처리 자동화
 
 - **Concept 슬러그 충돌 자동 해결**: 같은 슬러그의 기존 concept이 있을 때 보강 vs 새 슬러그 결정 로직을 스킬에서 더 명확히
-- **Concept↔Entry 양방향 링크 자동 갱신**: `/log-entry`로 entry 생성 시 그 세션에서 만든 concept들의 `related`에 entry slug를 추가하는 보강 단계
+- **Concept↔Entry 양방향 링크 자동 갱신**: ✅ `/log-entry` 명령에 임베드 완료 (위 #1 참조)
 - **태그 표준화**: 자유로운 태그 입력으로 시간이 지나면 비슷한 태그가 갈라짐 (`tmux`, `tmux-multi`, `multi-tmux` 등) → 주기적으로 정규화하는 작은 스크립트
 
 ### 4. 모바일 자동 캡처 (현재 불가)

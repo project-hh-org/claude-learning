@@ -185,7 +185,7 @@ updated: "2026-05-07"
 |---|---|---|---|
 | Rule | `configs/rules/<name>.md` | `~/.claude/rules/<name>.md` | Claude 행동 규칙 |
 | Hook | `configs/hooks/<name>.sh` | `~/.claude/settings.json`에 항목 등록 (파일 자체는 레포 안 그대로 사용) | PreToolUse / Stop 등 hook 스크립트 |
-| Command | `configs/commands/<name>.md` | `~/.claude/commands/<name>.md` | 커스텀 slash command |
+| Command | `configs/commands/<name>.md` | `~/.claude/commands/<name>.md` | 커스텀 slash command (예: `/log-entry`) |
 | Skill | `configs/skills/<name>/SKILL.md` | `~/.claude/skills/<name>/SKILL.md` | Skill 번들 (중첩 구조) |
 
 > ⚠️ **Skill만 구조가 다르다**: 다른 카테고리는 평탄한 `<category>/<file>.md`이지만, Skill은 `<category>/<name>/SKILL.md`로 중첩된다. 이는 Claude Code의 공식 Skill 발견 경로와 동일한 형식이다.
@@ -234,7 +234,7 @@ SCOPE=project bash scripts/install-claude-config.sh   # <repo>/.claude/...에 (p
 판단 기준:
 - "**만들어보면 좋겠다**" → `ideas/` 또는 `seeds/` (실현하려면 새 레포가 필요한가? yes면 seeds)
 - "**X가 뭔지 알았다**" → `concepts/`
-- "**오늘 한 일 회고**" → `entries/` (사용자가 명시 호출 — `/log-entry` 명령은 향후 추가 예정, [`docs/capture-pipeline-todo.md`](docs/capture-pipeline-todo.md) 참조)
+- "**오늘 한 일 회고**" → `entries/` (사용자가 `/log-entry` 명령으로 명시 호출. concepts 양방향 링크 자동 갱신 포함. 자세히는 [`configs/commands/log-entry.md`](configs/commands/log-entry.md))
 
 세 영역은 서로 겹치지 않는다. 헷갈리면 저장하지 않는다 — 침묵이 노이즈보다 낫다.
 
