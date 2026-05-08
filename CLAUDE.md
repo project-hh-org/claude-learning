@@ -93,9 +93,26 @@ CONCEPT_TEMPLATE.md ← concept 작성 템플릿
 
 | 타입 | 폴더 | 파일명 형식 | 설명 |
 |---|---|---|---|
-| Entry | `entries/` | `YYYY-MM-DD-slug.md` | 날짜 기반 학습 로그 |
-| Concept | `concepts/` | `concept-name.md` | 원자적 개념 노트 (날짜 없음) |
+| Entry | `entries/` | `YYYY-MM-DD-slug.md` | 날짜 기반 학습 로그 (서사형, 날짜가 내용의 일부) |
+| Concept | `concepts/` | `concept-name.md` | 영구 레퍼런스 노트 (날짜 무관, 정의·비교·패턴 포함) |
 | MOC | `moc/` | `topic.md` | 주제별 인덱스 (Dataview 활용) |
+
+### Entry vs Concept 판단 기준
+
+핵심 질문: **"날짜를 지워도 내용이 유효한가?"**
+
+- 유효하다 → `concepts/` (날짜가 의미 없는 영구 레퍼런스)
+- 날짜가 맥락의 일부다 → `entries/` (언제 했는지가 중요한 서사)
+
+| 이런 내용이면 | 폴더 | 예시 |
+|---|---|---|
+| "오늘 X를 설정했다 / 삽질했다" | `entries/` | ClickHouse 터미널 접속기 |
+| "X란 무엇인가" (정의) | `concepts/` | Claude Code Hooks 개념 |
+| "X와 Y의 차이" (비교) | `concepts/` | Reflection vs Ralph Loop 비교 |
+| "X 패턴 / 원리 정리" (합성) | `concepts/` | tmux Wave 패턴, AI 루프 패턴 |
+| "X 프로젝트 진행기" | `entries/` (type: lab) | 멀티 에이전트 실험 |
+
+> **concept은 원자적일 필요 없다.** 단일 개념 정의뿐 아니라 비교·합성·패턴 정리도 concept에 들어간다. 기준은 원자성이 아니라 **시간 독립성** — 나중에 참조할 영구 레퍼런스인가.
 
 ### 노트 간 연결 방법 (2가지)
 
@@ -308,7 +325,10 @@ SCOPE=project bash scripts/install-claude-config.sh   # <repo>/.claude/...에 (p
 | claude-code-hooks | Claude Code Hooks | evergreen |
 | claude-md-architecture | CLAUDE.md 3계층 아키텍처 | evergreen |
 | symlink-single-source | 심볼릭 링크 단일 소스 패턴 | evergreen |
-| aws-secrets-manager-pattern | AWS Secrets Manager 자격증명 패턴 | budding |
+| aws-secrets-manager-pattern | AWS Secrets Manager 자격증명 패턴 | evergreen |
+| reflection-loop | Reflection Loop | evergreen |
+| ralph-loop | Ralph Loop | evergreen |
+| ai-agent-loop-patterns | AI 에이전트 루프 패턴 비교 (Reflection vs Ralph) | evergreen |
 
 ---
 
