@@ -1,0 +1,64 @@
+/* ─── Sidebar 카드 ─── */
+.s-card {
+  background: var(--color-bg-elevated);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: 16px 18px;
+  margin-bottom: 14px;
+}
+.s-card h3 {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  margin-bottom: 12px;
+}
+.s-stat {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 0;
+  border-bottom: 1px solid rgba(63, 63, 70, 0.3);
+}
+.s-stat:last-child { border-bottom: none; }
+.s-stat .l { font-size: 12px; color: var(--color-text-muted); }
+.s-stat .v { font-size: 13px; font-weight: 700; }
+
+.tag-cloud { display: flex; flex-wrap: wrap; gap: 6px; }
+.cloud-tag {
+  padding: 3px 9px;
+  border-radius: var(--radius-pill);
+  font-size: 11px;
+  background: var(--color-bg-raised);
+  color: var(--color-text-muted);
+  cursor: pointer;
+  transition: all 0.15s;
+  border: none;
+  font-family: inherit;
+}
+.cloud-tag:hover { background: var(--color-primary-hover); color: #fff; }
+
+.s-note { font-size: 12px; color: var(--color-text-muted); line-height: 1.8; }
+.s-note em { color: var(--color-primary); font-style: italic; }
+
+/* sidebar 안에서 쓰는 작은 inline code */
+.s-inline-code {
+  font-size: 11px;
+  background: var(--color-bg-raised);
+  padding: 1px 5px;
+  border-radius: 4px;
+  color: var(--color-primary);
+}
+
+/* sidebar 안의 텍스트 링크 버튼 */
+.link-btn {
+  margin-top: 8px;
+  color: var(--color-primary);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  font: inherit;
+}
+.link-btn:hover { text-decoration: underline; }

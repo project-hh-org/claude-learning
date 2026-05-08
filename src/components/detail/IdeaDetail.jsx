@@ -2,6 +2,7 @@
 
 import DetailLayout from '../layout/DetailLayout'
 import { KindBadge, StageBadge } from '../ui/Badge'
+import Tag from '../ui/Tag'
 
 export default function IdeaDetail({ idea }) {
   return (
@@ -19,7 +20,7 @@ export default function IdeaDetail({ idea }) {
 
       <div className="post-tags">
         {idea.tags?.map(tag => (
-          <span key={tag} className="post-tag">{tag}</span>
+          <Tag variant="accent" key={tag}>{tag}</Tag>
         ))}
       </div>
 

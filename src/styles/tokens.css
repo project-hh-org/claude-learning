@@ -1,0 +1,52 @@
+/* ─── Design tokens (raw values) ───
+   원시 토큰. 세부 컴포넌트가 직접 참조하지 않고
+   semantic.css의 의미 토큰을 통해 사용한다.
+*/
+:root {
+  /* Color palette */
+  --c-bg:        #09090b;
+  --c-surface:   #18181b;
+  --c-surface2:  #27272a;
+  --c-border:    #3f3f46;
+  --c-text:      #fafafa;
+  --c-muted:     #a1a1aa;
+  --c-accent:    #a78bfa;
+  --c-accent2:   #7c3aed;
+  --c-green:     #4ade80;
+  --c-blue:      #60a5fa;
+  --c-yellow:    #facc15;
+  --c-orange:    #fb923c;
+  --c-red:       #f87171;
+
+  /* Geometry */
+  --radius-sm: 6px;
+  --radius:    10px;
+  --radius-pill: 20px;
+
+  /* Typography */
+  --font-mono: 'JetBrains Mono', 'Fira Code', Menlo, monospace;
+
+  /* Header height (sticky 계산용) */
+  --h-header: 60px;
+  --h-header-mobile: 52px;
+}
+
+/* ─── Legacy alias ───
+   기존 코드가 --bg / --accent 등 원시 이름을 직접 참조 중이라
+   당분간 유지. 점진적으로 semantic 토큰으로 교체.
+*/
+:root {
+  --bg:       var(--c-bg);
+  --surface:  var(--c-surface);
+  --surface2: var(--c-surface2);
+  --border:   var(--c-border);
+  --text:     var(--c-text);
+  --muted:    var(--c-muted);
+  --accent:   var(--c-accent);
+  --accent2:  var(--c-accent2);
+  --green:    var(--c-green);
+  --blue:     var(--c-blue);
+  --yellow:   var(--c-yellow);
+  --orange:   var(--c-orange);
+  --red:      var(--c-red);
+}
