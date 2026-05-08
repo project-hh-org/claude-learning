@@ -138,9 +138,10 @@ src/app/globals.css = @import 10줄
 | 4 | `CopyButton` 추출 | ✅ 완료 |
 | 5 | 폴더 분리 (`layout/`, `ui/`, `list/`, `detail/`) | ✅ 완료 |
 | 6a | CSS 분리(`src/styles/*`) + semantic token + Tag atom | ✅ 완료 |
-| 6b | Card 패밀리 atom (Card/CardBody/CardTitle/CardSummary/CardFooter) | 예정 |
-| 6c | Detail atom (DetailMeta/DetailTitle/DetailSummary/DetailTags/DetailBody) | 예정 |
-| 6d | atom들을 CSS Modules로 격리 | 예정 |
+| 6b | Card 패밀리 atom (Card/CardBody/CardTitle/CardSummary/CardFooter) | ✅ 완료 |
+| 6c | Detail atom (DetailMeta/DetailTitle/DetailSummary/DetailTags/DetailBody) | ✅ 완료 |
+| 6e | sidebar/ 폴더 분리 (LogSidebar/ConfigsSidebar/IdeasSidebar/SeedsSidebar) | ✅ 완료 |
+| 6d | atom들을 CSS Modules로 격리 | ⏸ 보류 — `src/styles/*` 분리만으로 globals.css 비대화 문제 해결됨. 모듈로 가면 cross-component 캐스케이드(`.post-card:hover .pc-title`) 우회 비용 큼 → 효익 < 비용으로 판단해 현 단계에서 보류. 추후 dark/light 분기나 디자인 시스템 도입 시 재검토 |
 
 각 단계는 독립적이라 PR 단위로 진행한다.
 
