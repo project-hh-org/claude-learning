@@ -1,11 +1,17 @@
 # claude/learn 프로젝트
 
-다희의 개발 학습 로그 블로그. Next.js SSG + AWS S3/CloudFront로 배포됨.
-URL: https://claude-learning.project-hh.com
+다희의 개발 학습 로그 블로그. Next.js 14 SSG + AWS S3/CloudFront로 배포됨.  
+URL: https://claude-learning.project-hh.com  
+패키지 매니저: npm (package-lock.json 기준)
+
+> ⚠️ **Claude는 이 레포에서 git 명령을 실행하지 않는다.**  
+> 샌드박스가 iCloud .git 폴더를 공유하기 때문에 실패 시 `.git/index.lock`이 남아 충돌이 발생한다.  
+> 파일 읽기/쓰기만 수행하고, git add/commit/push는 항상 사용자 터미널에서 직접 실행한다.
 
 ## 컴포넌트 컨벤션
 
-3계층 구조(`layout/` · `ui/` · `list/`+`detail/`)로 entity별 페이지를 조립한다. atom 단위 primitive(`Badge`, `EntryCard`, `MetaCard`)를 공유해 페이지마다 스타일이 갈라지는 것을 막는다.
+5계층 구조(`layout/` · `ui/` · `list/` · `detail/` · `sidebar/`)로 entity별 페이지를 조립한다.  
+atom 단위 primitive(`Badge`, `EntryCard`, `MetaCard`, Card 패밀리, Detail 패밀리)를 공유해 페이지마다 스타일이 갈라지는 것을 막는다.
 
 자세한 가이드: [`docs/component-conventions.md`](docs/component-conventions.md)
 
@@ -15,7 +21,7 @@ URL: https://claude-learning.project-hh.com
 
 ## 라우트 / 네비게이션
 
-`src/components/TabNav.jsx`가 모든 인덱스 페이지에서 공유되는 단일 탭 네비게이션이다.
+`src/components/layout/TabNav.jsx`가 모든 인덱스 페이지에서 공유되는 단일 탭 네비게이션이다.  
 페이지별로 탭 항목을 다르게 두지 않는다 — 4개 라우트로 고정:
 
 | 탭 | 경로 | 페이지 컴포넌트 |
@@ -26,10 +32,8 @@ URL: https://claude-learning.project-hh.com
 | 🌱 Seeds | `/seeds` (+ `/seeds/...`) | `SeedList` |
 
 탭은 Next.js `<Link>` + `usePathname` 기반이라 클라이언트 SPA 네비게이션으로 동작 (전체 새로고침 없음). 새 인덱스 페이지를 추가할 때는:
-1. `src/app/<name>/page.jsx`와 `src/components/<Name>List.jsx`를 만들고
+1. `src/app/<name>/page.jsx`와 `src/components/list/<Name>List.jsx`를 만들고
 2. `TabNav.jsx`의 `TABS` 배열에 항목 추가
-
-탭 항목을 페이지별로 다르게 두지 않는다(이전에는 그랬으나 일관성 깨짐).
 
 ---
 
@@ -56,15 +60,24 @@ src/
     configs/[category]/[slug]/  ← Config 상세 페이지
     ideas/, ideas/[slug]/       ← Ideas 인덱스/상세
     seeds/, seeds/[slug]/       ← Seeds 인덱스/상세
+    globals.css                 ← @import 허브 (실제 스타일은 src/styles/에)
+    layout.jsx                  ← 루트 레이아웃
   components/
-    TabNav.jsx                  ← 공유 탭 네비게이션 (4개 라우트, Link 기반 SPA, pathname-based active)
-    PostList.jsx                ← Learning Log 인덱스 (홈)
-    PostDetail.jsx              ← Entry 상세
-    ConceptDetail.jsx           ← Concept 상세
-    ConfigsList.jsx             ← Configs 인덱스
-    ConfigDetail.jsx            ← Config 상세
-    IdeaList.jsx, IdeaDetail.jsx
-    SeedList.jsx, SeedDetail.jsx
+    layout/
+      TabNav.jsx         ← 공유 탭 네비게이션 (4개 라우트, pathname-based active)
+      ListLayout.jsx     ← 인덱스 페이지 공통 셸
+      DetailLayout.jsx   ← 상세 페이지 공통 셸
+    ui/                  ← atom 단위 primitive (프레젠테이션만, 사이드 이펙트 X)
+      Badge.jsx, EntryCard.jsx, MetaCard.jsx
+      Card.jsx, CardBody.jsx, CardTitle.jsx, CardSummary.jsx, CardFooter.jsx
+      DetailMeta.jsx, DetailTitle.jsx, DetailSummary.jsx, DetailTags.jsx, DetailBody.jsx
+      SearchInput.jsx, TagFilter.jsx, Tag.jsx, CopyButton.jsx
+    list/
+      PostList.jsx, ConfigsList.jsx, IdeaList.jsx, SeedList.jsx
+    detail/
+      PostDetail.jsx, ConceptDetail.jsx, ConfigDetail.jsx, IdeaDetail.jsx, SeedDetail.jsx
+    sidebar/
+      LogSidebar.jsx, ConfigsSidebar.jsx, IdeasSidebar.jsx, SeedsSidebar.jsx
   lib/
     posts.js      ← entries/ 파싱 + wikilink 변환 + 백링크 계산
     concepts.js   ← concepts/ 파싱
@@ -72,8 +85,19 @@ src/
     seeds.js      ← seeds/ 파싱 + starter_prompt 추출
     wikilink.js   ← [[wikilink]] → HTML 변환 유틸
     configs.js    ← configs/ 파싱 (skills 중첩 구조 처리, installPath 노출)
+  styles/         ← CSS 분리 (globals.css가 @import)
+    tokens.css       :root 변수 (raw colors, radius, font, header heights)
+    semantic.css     의미 토큰 (--color-bg, --color-text, --color-primary 등)
+    reset.css        *, html, body, scrollbar
+    typography.css   body 폰트 / a 기본
+    layout.css       header, page-wrap, sidebar, tab-bar
+    forms.css        search-input, tags-row, tag-btn
+    cards.css        post-card, cfg-card, cfg-badge, cfg-path
+    sidebar.css      s-card, s-stat, tag-cloud, link-btn
+    details.css      post-page, post-meta, post-title, post-body, copy-btn
+    mobile.css       모든 @media (max-width: 740px) — 마지막 import 필수
 scripts/
-  bootstrap.sh                  ← 새 기기 1회 셋업 (npm + claude config)
+  bootstrap.sh                  ← 새 기기 1회 셋업 (npm install + claude config)
   install-claude-config.sh      ← Code: skills/rules/commands 심볼릭 링크 + Stop hook + vault 경로 기록
   setup-claude-desktop.sh       ← chat app: filesystem MCP + Custom Instructions 가이드
   install-launchd.sh            ← (선택) macOS 자동 push 워처
@@ -81,7 +105,7 @@ scripts/
   setup-git.sh                  ← (niche) iCloud 동기화 등으로 .git 빠진 경우만
   generate-sitemap.mjs          ← 빌드 시 sitemap.xml 생성
 public/
-TEMPLATE.md       ← entry 작성 템플릿
+TEMPLATE.md         ← entry 작성 템플릿
 CONCEPT_TEMPLATE.md ← concept 작성 템플릿
 ```
 
@@ -112,7 +136,7 @@ CONCEPT_TEMPLATE.md ← concept 작성 템플릿
 | "X 패턴 / 원리 정리" (합성) | `concepts/` | tmux Wave 패턴, AI 루프 패턴 |
 | "X 프로젝트 진행기" | `entries/` (type: lab) | 멀티 에이전트 실험 |
 
-> **concept은 원자적일 필요 없다.** 단일 개념 정의뿐 아니라 비교·합성·패턴 정리도 concept에 들어간다. 기준은 원자성이 아니라 **시간 독립성** — 나중에 참조할 영구 레퍼런스인가.
+> **concept은 원자적일 필요 없다.** 기준은 원자성이 아니라 **시간 독립성** — 나중에 참조할 영구 레퍼런스인가.
 
 ### 노트 간 연결 방법 (2가지)
 
@@ -208,11 +232,11 @@ updated: "2026-05-07"
 | 카테고리 | 폴더 구조 | 설치 경로 | 용도 |
 |---|---|---|---|
 | Rule | `configs/rules/<name>.md` | `~/.claude/rules/<name>.md` | Claude 행동 규칙 |
-| Hook | `configs/hooks/<name>.sh` | `~/.claude/settings.json`에 항목 등록 (파일 자체는 레포 안 그대로 사용) | PreToolUse / Stop 등 hook 스크립트 |
+| Hook | `configs/hooks/<name>.sh` | `~/.claude/settings.json`에 항목 등록 | PreToolUse / Stop 등 hook 스크립트 |
 | Command | `configs/commands/<name>.md` | `~/.claude/commands/<name>.md` | 커스텀 slash command (예: `/log-entry`) |
 | Skill | `configs/skills/<name>/SKILL.md` | `~/.claude/skills/<name>/SKILL.md` | Skill 번들 (중첩 구조) |
 
-> ⚠️ **Skill만 구조가 다르다**: 다른 카테고리는 평탄한 `<category>/<file>.md`이지만, Skill은 `<category>/<name>/SKILL.md`로 중첩된다. 이는 Claude Code의 공식 Skill 발견 경로와 동일한 형식이다.
+> ⚠️ **Skill만 구조가 다르다**: 다른 카테고리는 평탄한 `<category>/<file>.md`이지만, Skill은 `<category>/<name>/SKILL.md`로 중첩된다.
 
 **Frontmatter 필수 필드**:
 
@@ -253,16 +277,16 @@ SCOPE=project bash scripts/install-claude-config.sh   # <repo>/.claude/...에 (p
 |---|---|---|---|
 | 현재 프로젝트 맥락의 메모/생각 | `ideas/` | spark / buildable | thinking에서 발상 — `capture-idea` skill |
 | 완전히 별개의 새 프로젝트 씨앗 | `seeds/` | 한 줄 피치 + 기획 + starter prompt | thinking에서 발상 — `capture-idea` skill |
-| 새로 알게 된 정의/원리/패턴 | `concepts/` | 원자적 영구 노트 (seedling 상태) | 사용자 학습 시그널 — `capture-concept` skill |
+| 새로 알게 된 정의/원리/패턴 | `concepts/` | 영구 노트 (seedling 상태) | 사용자 학습 시그널 — `capture-concept` skill |
 
 판단 기준:
 - "**만들어보면 좋겠다**" → `ideas/` 또는 `seeds/` (실현하려면 새 레포가 필요한가? yes면 seeds)
 - "**X가 뭔지 알았다**" → `concepts/`
-- "**오늘 한 일 회고**" → `entries/` (사용자가 `/log-entry` 명령으로 명시 호출. concepts 양방향 링크 자동 갱신 포함. 자세히는 [`configs/commands/log-entry.md`](configs/commands/log-entry.md))
+- "**오늘 한 일 회고**" → `entries/` (사용자가 `/log-entry` 명령으로 명시 호출)
 
 세 영역은 서로 겹치지 않는다. 헷갈리면 저장하지 않는다 — 침묵이 노이즈보다 낫다.
 
-### 구성요소 (하이브리드 — 즉시 캡처 + Stop hook 합성)
+### 구성요소
 
 | 종류 | 파일 | 역할 |
 |---|---|---|
@@ -272,37 +296,19 @@ SCOPE=project bash scripts/install-claude-config.sh   # <repo>/.claude/...에 (p
 | Rule | `configs/rules/capture-concepts.md` | capture-concept 발동 강제 |
 | Stop hook (안전망) | `configs/hooks/idea-safety-net.sh` | 세션 끝에 thinking 후처리 → `ideas/_unsorted/` |
 | Stop hook (합성) | `configs/hooks/concept-synthesis.sh` | 세션 끝에 정의 Q&A 추출 → `concepts/_unsorted/` |
-| Desktop 셋업 | `scripts/setup-claude-desktop.sh` | chat app용 filesystem MCP 등록 |
 
 `_unsorted/` 폴더의 후보는 사용자가 검토 후 정식 위치로 옮기거나 삭제한다.
 
-### 캡처 후 흐름
-
-`ideas/`·`seeds/`·`concepts/`에 파일 생성 → 자동 push → S3 배포 → `/ideas`·`/seeds` 페이지에서 열람 (concept은 기존 `/concept/[slug]` 페이지로 노출). seed 페이지의 "📋 프롬프트 복사" 버튼으로 starter prompt를 즉시 새 세션에 사용 가능.
-
 ### 머신별 1회 셋업
 
-각 머신에서 한 번씩 등록이 필요하다. 자세한 절차: [`docs/idea-capture-setup.md`](docs/idea-capture-setup.md)
+자세한 절차: [`docs/idea-capture-setup.md`](docs/idea-capture-setup.md)
 
-- **새 기기 1회 셋업 (권장)**:
-  ```bash
-  bash scripts/bootstrap.sh
-  ```
-  → `npm install` + `install-claude-config.sh`를 묶어 실행.
-- **Claude Code (CLI)** + **Claude Code Desktop app**:
-  ```bash
-  bash scripts/install-claude-config.sh
-  ```
-  → `~/.claude/skills/`, `~/.claude/rules/`, `~/.claude/commands/`에 심볼릭 링크 + Stop hook 자동 등록 + **`~/.claude/learning-vault.path`에 이 레포 절대경로 기록 (cwd 무관 중앙집중)**.
-- **Claude Desktop chat app** (claude.ai/download — 별개 제품):
-  ```bash
-  bash scripts/setup-claude-desktop.sh
-  ```
-  → filesystem MCP 등록 + Custom Instructions 가이드 작성. 가이드는 수동으로 Settings에 복붙.
-- **Claude 모바일앱**: 자동 캡처 불가 (로컬 MCP/Hook/파일 쓰기 모두 미지원). Custom Instructions로 응답에 명시 출력 후 수동 이동만 가능.
+```bash
+bash scripts/bootstrap.sh   # npm install + install-claude-config.sh 묶음 실행
+```
 
 > ⚠️ "Claude Code Desktop app"과 "Claude Desktop chat app"은 **다른 제품**이다.  
-> 전자는 Claude Code의 GUI 버전(Skills/Hooks 모두 지원), 후자는 claude.ai에서 다운로드하는 채팅 앱(Skills/Hooks 지원 여부 불확실 → MCP + Custom Instructions 우회).
+> 전자는 Claude Code의 GUI 버전(Skills/Hooks 모두 지원), 후자는 claude.ai에서 다운로드하는 채팅 앱(MCP + Custom Instructions 우회).
 
 ---
 
@@ -316,6 +322,7 @@ SCOPE=project bash scripts/install-claude-config.sh   # <repo>/.claude/...에 (p
 | 2026-05-05 | obsidian-git-auto-push | Obsidian 자동 push |
 | 2026-05-07 | clickhouse-terminal-access | ClickHouse 터미널 접속 |
 | 2026-05-07 | zettelkasten-obsidian-blog | 제텔카스텐 블로그 구축 |
+| 2026-05-08 | ai-loop-reflection-ralph | AI 에이전트 루프 패턴 (Reflection vs Ralph) |
 
 ## 현재 concepts 목록
 
@@ -329,6 +336,8 @@ SCOPE=project bash scripts/install-claude-config.sh   # <repo>/.claude/...에 (p
 | reflection-loop | Reflection Loop | evergreen |
 | ralph-loop | Ralph Loop | evergreen |
 | ai-agent-loop-patterns | AI 에이전트 루프 패턴 비교 (Reflection vs Ralph) | evergreen |
+| aws-cli-config | AWS CLI 설정 | seedling |
+| yarn-vs-pnpm | yarn vs pnpm 패키지 매니저 비교 | evergreen |
 
 ---
 
