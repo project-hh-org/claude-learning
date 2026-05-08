@@ -3,6 +3,7 @@
 import { useRouter } from 'next/navigation'
 import DetailLayout from '../layout/DetailLayout'
 import { StageBadge } from '../ui/Badge'
+import Tag from '../ui/Tag'
 
 function formatDate(dateStr) {
   const d = new Date(dateStr)
@@ -24,7 +25,7 @@ export default function PostDetail({ post }) {
 
       <div className="post-tags">
         {post.tags?.map(tag => (
-          <span key={tag} className="post-tag">{tag}</span>
+          <Tag variant="accent" key={tag}>{tag}</Tag>
         ))}
       </div>
 

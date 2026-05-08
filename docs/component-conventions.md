@@ -66,10 +66,55 @@ src/lib/          ← 데이터 layer (markdown 파싱)
 
 | 상황 | 권장 |
 |---|---|
-| 반복되는 패턴 (cfg-badge, post-card 등) | CSS 클래스 (globals.css) |
+| 반복되는 패턴 (cfg-badge, post-card 등) | CSS 클래스 (`src/styles/*.css`) |
 | 한 번만 쓰이는 미세 조정 | 인라인 스타일 OK |
 | 동적 값 (예: stage color) | inline `style={{ color: stage.color }}` |
 | 새로 도입되는 패턴 | 우선 인라인으로 시도 → 2회 이상 반복되면 atom/클래스로 승격 |
+
+## 스타일 파일 구조
+
+`globals.css`는 단순 import 허브로 단순화. 실제 스타일은 주제별 파일로 분리:
+
+```
+src/styles/
+  tokens.css       :root 변수 (raw colors, radius, font, header heights)
+  semantic.css     의미 토큰 (--color-bg, --color-text, --color-primary 등)
+                   raw 토큰 위에 한 겹 — theme 추가 시 이 매핑만 바꾸면 됨
+  reset.css        *, html, body, scrollbar
+  typography.css   body 폰트 / a 기본
+  layout.css       header, page-wrap, sidebar, tab-bar
+  forms.css        search-input, tags-row, tag-btn
+  cards.css        year-group, post-card, pc-*, cfg-card, cfg-badge, cfg-path
+  sidebar.css      s-card, s-stat, tag-cloud, link-btn 등
+  details.css      post-page, post-meta, post-title, post-body, zettel-*, copy-btn 등
+  mobile.css       모든 @media (max-width: 740px) 모음 — 마지막에 import
+src/app/globals.css = @import 10줄
+```
+
+**주의**: `mobile.css`는 마지막에 import해야 source-order로 base 스타일 override가 정상 적용됨.
+
+## Theme 관리
+
+추가 라이브러리(Tailwind/vanilla-extract 등) 없이 CSS variables 2계층으로 관리:
+
+1. **`tokens.css` — raw 색상 팔레트** (실제 hex 값)
+2. **`semantic.css` — 의미 토큰** (`--color-bg`, `--color-text-muted` 등이 raw 토큰을 참조)
+
+라이트/다크 등 새 theme 추가 시 `semantic.css`에 다음 한 블록만 추가:
+
+```css
+[data-theme="light"] {
+  --color-bg:           #ffffff;
+  --color-bg-elevated:  #f5f5f5;
+  --color-text:         #18181b;
+  --color-text-muted:   #71717a;
+  /* ... */
+}
+```
+
+그리고 `<html data-theme="light">`로 토글. 컴포넌트 코드는 그대로(의미 토큰 참조).
+
+> 점진 마이그레이션 중: 기존 raw 토큰 (`var(--accent)`)을 직접 쓰는 코드가 많아 `tokens.css`에 legacy alias를 유지. 새 코드는 의미 토큰(`var(--color-primary)`)을 우선 사용.
 
 ## 새 entity 추가 시
 
@@ -92,7 +137,10 @@ src/lib/          ← 데이터 layer (markdown 파싱)
 | 3 | `SearchInput` / `TagFilter` atom 추출 | ✅ 완료 |
 | 4 | `CopyButton` 추출 | ✅ 완료 |
 | 5 | 폴더 분리 (`layout/`, `ui/`, `list/`, `detail/`) | ✅ 완료 |
-| 6 | CSS 정리 (globals.css 주제별 분리 또는 CSS Modules) | 진행 예정 |
+| 6a | CSS 분리(`src/styles/*`) + semantic token + Tag atom | ✅ 완료 |
+| 6b | Card 패밀리 atom (Card/CardBody/CardTitle/CardSummary/CardFooter) | 예정 |
+| 6c | Detail atom (DetailMeta/DetailTitle/DetailSummary/DetailTags/DetailBody) | 예정 |
+| 6d | atom들을 CSS Modules로 격리 | 예정 |
 
 각 단계는 독립적이라 PR 단위로 진행한다.
 

@@ -2,6 +2,7 @@
 
 import DetailLayout from '../layout/DetailLayout'
 import { CategoryBadge } from '../ui/Badge'
+import Tag from '../ui/Tag'
 
 export default function ConfigDetail({ config }) {
   return (
@@ -20,7 +21,7 @@ export default function ConfigDetail({ config }) {
 
       <div className="post-tags">
         {config.tags?.map(tag => (
-          <span key={tag} className="post-tag">{tag}</span>
+          <Tag variant="accent" key={tag}>{tag}</Tag>
         ))}
       </div>
 

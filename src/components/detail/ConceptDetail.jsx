@@ -3,6 +3,7 @@
 import { useRouter } from 'next/navigation'
 import DetailLayout from '../layout/DetailLayout'
 import { StageBadge } from '../ui/Badge'
+import Tag from '../ui/Tag'
 
 export default function ConceptDetail({ concept }) {
   const router = useRouter()
@@ -21,7 +22,7 @@ export default function ConceptDetail({ concept }) {
 
       <div className="post-tags">
         {concept.tags?.map(tag => (
-          <span key={tag} className="post-tag">{tag}</span>
+          <Tag variant="accent" key={tag}>{tag}</Tag>
         ))}
       </div>
 

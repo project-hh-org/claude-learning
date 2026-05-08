@@ -12,8 +12,10 @@
  *   />
  *
  * footerExtras: tags 앞에 추가로 렌더할 노드 (날짜, 경로, 출처 등)
- * tags: 배열로 받으면 .pc-tag 자동 렌더
+ * tags: 배열로 받으면 Tag atom으로 자동 렌더
  */
+import Tag from './Tag'
+
 export default function MetaCard({
   badge,
   title,
@@ -40,7 +42,7 @@ export default function MetaCard({
           <div className="pc-footer">
             {footerExtras}
             {tags.map(tag => (
-              <span key={tag} className="pc-tag">{tag}</span>
+              <Tag key={tag}>{tag}</Tag>
             ))}
           </div>
         )}

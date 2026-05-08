@@ -1,0 +1,39 @@
+/* ─── Semantic tokens ───
+   tokens.css의 원시 색상 위에 의미를 부여한 한 겹.
+   컴포넌트는 가능하면 의미 토큰만 참조한다.
+   theme 추가 시 (예: light mode) 이 매핑만 바꾸면 됨:
+     [data-theme="light"] { --color-bg: #fff; ... }
+*/
+:root {
+  /* Surface */
+  --color-bg:           var(--c-bg);
+  --color-bg-elevated:  var(--c-surface);
+  --color-bg-raised:    var(--c-surface2);
+
+  /* Text */
+  --color-text:          var(--c-text);
+  --color-text-muted:    var(--c-muted);
+  --color-text-link:     var(--c-accent);
+
+  /* Border */
+  --color-border:        var(--c-border);
+  --color-border-strong: var(--c-accent);
+
+  /* Status / accent */
+  --color-primary:       var(--c-accent);
+  --color-primary-hover: var(--c-accent2);
+  --color-success:       var(--c-green);
+  --color-info:          var(--c-blue);
+  --color-warning:       var(--c-yellow);
+  --color-danger:        var(--c-red);
+  --color-tone-orange:   var(--c-orange);
+}
+
+/* ─── Future theme override 예시 ───
+   [data-theme="light"] {
+     --color-bg:           #ffffff;
+     --color-bg-elevated:  #f5f5f5;
+     --color-text:         #18181b;
+     ...
+   }
+*/

@@ -1,16 +1,7 @@
 /**
  * EntryCard — 날짜 컬럼이 왼쪽에 있는 카드. Learning Log 인덱스 전용.
- *
- *   <EntryCard
- *     date="2026-05-07"
- *     title="..."
- *     summary="..."
- *     tags={['tag1', 'tag2']}
- *     onClick={() => router.push(`/${slug}`)}
- *   />
- *
- * 클래스는 globals.css의 .post-card / .pc-* 를 그대로 사용한다.
  */
+import Tag from './Tag'
 
 const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
 
@@ -42,7 +33,7 @@ export default function EntryCard({ date, title, summary, tags = [], onClick }) 
         {tags.length > 0 && (
           <div className="pc-footer">
             {tags.map(tag => (
-              <span key={tag} className="pc-tag">{tag}</span>
+              <Tag key={tag}>{tag}</Tag>
             ))}
           </div>
         )}
