@@ -1,5 +1,5 @@
 import { getAllSeedSlugs, getSeedBySlug } from '@/lib/seeds'
-import SeedDetail from '@/components/SeedDetail'
+import SeedDetail from '@/components/detail/SeedDetail'
 import { notFound } from 'next/navigation'
 
 export async function generateStaticParams() {

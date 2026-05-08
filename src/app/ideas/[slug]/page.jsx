@@ -1,5 +1,5 @@
 import { getAllIdeaSlugs, getIdeaBySlug } from '@/lib/ideas'
-import IdeaDetail from '@/components/IdeaDetail'
+import IdeaDetail from '@/components/detail/IdeaDetail'
 import { notFound } from 'next/navigation'
 
 export async function generateStaticParams() {

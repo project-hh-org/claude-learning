@@ -1,7 +1,7 @@
 'use client'
 
-import DetailLayout from './DetailLayout'
-import { KindBadge, StageBadge } from './Badge'
+import DetailLayout from '../layout/DetailLayout'
+import { KindBadge, StageBadge } from '../ui/Badge'
 
 export default function IdeaDetail({ idea }) {
   return (

@@ -2,10 +2,10 @@
 
 import { useState, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
-import ListLayout from './ListLayout'
-import MetaCard from './MetaCard'
-import SearchInput from './SearchInput'
-import { CategoryBadge } from './Badge'
+import ListLayout from '../layout/ListLayout'
+import MetaCard from '../ui/MetaCard'
+import SearchInput from '../ui/SearchInput'
+import { CategoryBadge } from '../ui/Badge'
 
 const CATEGORY_ORDER = ['rules', 'hooks', 'commands', 'skills']
 
