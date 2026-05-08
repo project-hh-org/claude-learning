@@ -1,7 +1,11 @@
-# 아이디어 자동 캡처 — 셋업 가이드
+# 자동 캡처 파이프라인 — 셋업 가이드
 
-`ideas/`와 `seeds/`에 발상이 자동으로 떨어지게 만들기 위한 **수동 설정 절차**.
+`ideas/`·`seeds/`·`concepts/`에 발상·새 프로젝트 씨앗·학습한 개념이
+**자동으로** 떨어지게 만들기 위한 **수동 설정 절차**.
 각 머신마다 1회만 하면 된다.
+
+> 이 문서의 파일명은 `idea-capture-setup`이지만 실제 범위는
+> ideas + seeds + concepts 모두를 다룬다.
 
 | 대상 | 무엇을 | 빈도 |
 |---|---|---|
@@ -51,8 +55,13 @@ bash scripts/install-claude-config.sh
 ### 동작 확인
 
 1. Claude Code로 새 세션 시작 (`claude` 명령) 또는 Claude Code Desktop app 재시작
-2. 짧게 대화하면서 발상이 떠올랐을 때 `ideas/` 또는 `seeds/`에 마크다운이 자동 생성되는지 확인
-3. 세션 종료 후 `<repo>/ideas/_unsorted/`에 누락 후보가 떨어졌는지 확인 (안전망 hook 동작)
+2. 짧게 대화하면서:
+   - 발상이 떠올랐을 때 `ideas/` 또는 `seeds/`에 자동 생성 확인 (`capture-idea` skill)
+   - "X가 뭐야?" 같은 학습 질문을 하고 답변 후 `concepts/`에 seedling 자동 생성 확인 (`capture-concept` skill)
+3. 세션 종료 후:
+   - `<repo>/ideas/_unsorted/` — thinking 후처리로 누락된 발상 후보 (`idea-safety-net.sh`)
+   - `<repo>/concepts/_unsorted/` — 정의 Q&A 합성 후보 (`concept-synthesis.sh`)
+4. `_unsorted/` 안의 후보들을 검토 → 가치 있는 것만 정식 폴더(`ideas/`, `seeds/`, `concepts/`)로 이동 + frontmatter 정비. 나머지 삭제.
 
 ### 끄고 싶을 때
 
