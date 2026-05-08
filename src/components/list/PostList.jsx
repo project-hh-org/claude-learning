@@ -6,6 +6,7 @@ import ListLayout from '../layout/ListLayout'
 import EntryCard from '../ui/EntryCard'
 import SearchInput from '../ui/SearchInput'
 import TagFilter from '../ui/TagFilter'
+import LogSidebar from '../sidebar/LogSidebar'
 
 export default function PostList({ posts }) {
   const router = useRouter()
@@ -46,46 +47,13 @@ export default function PostList({ posts }) {
     return posts.filter(p => p.date?.startsWith(ym)).length
   }, [posts])
 
-  const sidebar = (
-    <>
-      <div className="s-card">
-        <h3>📊 통계</h3>
-        <div className="s-stat"><span className="l">전체 글</span><span className="v">{posts.length}</span></div>
-        <div className="s-stat"><span className="l">이번 달</span><span className="v">{thisMonth}</span></div>
-        <div className="s-stat"><span className="l">태그 수</span><span className="v">{allTags.length}</span></div>
-      </div>
-      <div className="s-card">
-        <h3>🏷️ 태그</h3>
-        <div className="tag-cloud">
-          {allTags.map(tag => (
-            <button key={tag} className="cloud-tag" onClick={() => setActiveTag(tag)}>
-              {tag}
-            </button>
-          ))}
-        </div>
-      </div>
-      <div className="s-card">
-        <h3>📌 새 글 추가</h3>
-        <div className="s-note">
-          새로운 것을 배웠다면 Claude에게:<br />
-          <em>&quot;오늘 [주제] 배웠어, 러닝 로그에 추가해줘&quot;</em><br /><br />
-          <code className="s-inline-code">entries/</code>에 .md 저장 → 자동 push → S3 배포
-        </div>
-      </div>
-      <div className="s-card">
-        <h3>☁️ 배포</h3>
-        <div className="s-note">git push → GitHub Actions → AWS S3 + CloudFront</div>
-      </div>
-    </>
-  )
-
   return (
     <ListLayout
       stats={[
         { label: '총', value: posts.length, suffix: '개' },
         { label: '태그', value: allTags.length, suffix: '개' },
       ]}
-      sidebar={sidebar}
+      sidebar={<LogSidebar posts={posts} tags={allTags} thisMonth={thisMonth} onTagClick={setActiveTag} />}
     >
       <div className="controls">
         <SearchInput
