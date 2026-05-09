@@ -1,0 +1,46 @@
+{
+  "start": {
+    "title": "기획 빌더",
+    "subtitle": "AI와 함께 0→100 프로젝트 기획을 완성하세요",
+    "goalPlaceholder": "어떤 것을 만들고 싶으신가요? (예: 동네 주민을 위한 중고거래 앱)",
+    "orPickTemplate": "또는 템플릿 선택",
+    "platforms": "플랫폼",
+    "startPlanning": "기획 시작",
+    "resume": "이전 기획 이어하기"
+  },
+  "templates": {
+    "ecommerce": "커머스",
+    "social": "SNS",
+    "saas": "SaaS",
+    "internal-tool": "사내툴",
+    "content": "콘텐츠",
+    "booking": "예약",
+    "custom": "직접 정의"
+  },
+  "platforms": {
+    "app": "📱 모바일 앱",
+    "web": "🌐 웹",
+    "responsive": "📱🌐 반응형",
+    "multi": "📱+🌐 멀티"
+  },
+  "flow": {
+    "loading": "AI가 다음 단계를 준비하고 있어요…",
+    "next": "다음 단계 →",
+    "viewWireframe": "와이어프레임 보기",
+    "viewDocuments": "산출물 보기",
+    "customInputPlaceholder": "직접 입력…",
+    "completion": "{{score}}%"
+  },
+  "priority": {
+    "required": "필수",
+    "recommended": "권장",
+    "optional": "선택"
+  },
+  "common": {
+    "cancel": "취소",
+    "confirm": "확인",
+    "loading": "불러오는 중…",
+    "error": "문제가 발생했습니다",
+    "retry": "다시 시도"
+  }
+}

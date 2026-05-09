@@ -1,0 +1,46 @@
+{
+  "start": {
+    "title": "Planning Builder",
+    "subtitle": "Build a complete 0→100 project plan with AI",
+    "goalPlaceholder": "What do you want to build? (e.g., a neighborhood marketplace app)",
+    "orPickTemplate": "Or pick a template",
+    "platforms": "Platforms",
+    "startPlanning": "Start planning",
+    "resume": "Resume previous plan"
+  },
+  "templates": {
+    "ecommerce": "E-commerce",
+    "social": "Social",
+    "saas": "SaaS",
+    "internal-tool": "Internal tool",
+    "content": "Content",
+    "booking": "Booking",
+    "custom": "Custom"
+  },
+  "platforms": {
+    "app": "📱 Mobile",
+    "web": "🌐 Web",
+    "responsive": "📱🌐 Responsive",
+    "multi": "📱+🌐 Multi"
+  },
+  "flow": {
+    "loading": "AI is preparing the next step…",
+    "next": "Next step →",
+    "viewWireframe": "Open wireframe",
+    "viewDocuments": "View documents",
+    "customInputPlaceholder": "Add your own…",
+    "completion": "{{score}}%"
+  },
+  "priority": {
+    "required": "Required",
+    "recommended": "Recommended",
+    "optional": "Optional"
+  },
+  "common": {
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "loading": "Loading…",
+    "error": "Something went wrong",
+    "retry": "Retry"
+  }
+}

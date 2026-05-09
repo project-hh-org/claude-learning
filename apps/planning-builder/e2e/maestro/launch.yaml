@@ -1,0 +1,4 @@
+appId: com.example.aiplanner.dev
+---
+- launchApp
+- assertVisible: "기획 빌더"
