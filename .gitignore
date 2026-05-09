@@ -27,6 +27,3 @@ npm-debug.log*
 .obsidian/
 .trash/
 app.json
-
-# ── Ephemeral transfer artifacts (sandbox-only) ──
-*.bundle
