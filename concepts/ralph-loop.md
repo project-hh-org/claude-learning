@@ -7,7 +7,7 @@ related:
   - "reflection-loop"
   - "claude-code-hooks"
 created: "2026-05-08"
-updated: "2026-05-08"
+updated: "2026-05-17"
 ---
 
 ## 정의
@@ -66,7 +66,57 @@ Anthropic이 공식 플러그인(`ralph-wiggum`)을 제공한다.
 - UX/디자인처럼 인간 피드백이 필수인 결정
 - 창의적 설계나 아키텍처 선택
 
+## 실전 설계 결정: error_max_turns 처리
+
+Claude CLI로 루프를 구동할 때 에이전트가 최대 턴 수에 도달하면 `error_max_turns` 에러가 반환된다.
+
+```json
+{
+  "subtype": "error_max_turns",
+  "stop_reason": "tool_use",
+  "is_error": true
+}
+```
+
+`stop_reason: "tool_use"`는 에이전트가 도구를 호출하던 **도중**에 잘렸다는 의미다.
+이때 두 가지 선택지가 있다:
+
+**선택 A — 부분 결과 pass-through (권장하지 않음)**
+
+`result` 필드를 꺼내 다음 단계에 전달한다. 얼핏 "어느 정도 했으니 계속"처럼 보이지만, 탐지/분석 단계가 중간에 잘렸다면 일부 이슈가 누락된 상태다. 다음 단계가 이걸 전달받으면 불완전한 결과를 만들어내고, Reviewer가 PASS를 줘도 실제로는 절반짜리 수정이 된다.
+
+**선택 B — 즉시 실패 (권장)**
+
+```python
+if data.get("subtype") == "error_max_turns":
+    raise RuntimeError(f"[{phase}] 턴 한도 초과 — 탐지 미완료, 강제 종료")
+```
+
+루프를 중단하고 수동 검토(ESCALATE)로 처리한다. **정확도가 목표인 자동화에서는 틀린 결과보다 실패가 낫다.**
+
+근본 해결은 `MAX_TURNS`를 충분히 늘리거나 해당 단계의 프롬프트를 단순화하는 것이다.
+
+## 실전 설계 결정: 일시적 API 오류 재시도
+
+Cloudflare 522, Anthropic 529 등 일시적 오류는 루프 전체를 종료하지 않고 재시도해야 한다. Claude CLI JSON 응답에 `"retryable": true`와 `retry_after` 값이 포함돼 있으면 대기 후 재시도한다.
+
+```python
+_RETRYABLE_PATTERNS = ["retryable", "529", "503", "502", "rate_limit", "overloaded"]
+
+def _is_retryable(stdout, stderr):
+    combined = (stdout + stderr).lower()
+    for pattern in _RETRYABLE_PATTERNS:
+        if pattern in combined:
+            m = re.search(r"retry_after[\":\s]+(\d+)", combined)
+            wait = int(m.group(1)) if m else 120
+            return True, wait
+    return False, 0
+```
+
+재시도 횟수 상한(예: 3회)을 두고, 소진되면 RuntimeError로 전파한다.
+
 ## 참고
 
 - [GitHub - snarktank/ralph](https://github.com/snarktank/ralph)
 - [Anthropic Plugin](https://claude.com/plugins/ralph-loop)
+- [[claude-cli-allowed-tools]] — Claude CLI 도구 지정 시 주의사항
