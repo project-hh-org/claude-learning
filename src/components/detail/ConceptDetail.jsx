@@ -8,7 +8,7 @@ import DetailTitle from '../ui/DetailTitle'
 import DetailTags from '../ui/DetailTags'
 import DetailBody from '../ui/DetailBody'
 
-export default function ConceptDetail({ concept }) {
+export default function ConceptDetail({ concept, conceptSlugs = new Set() }) {
   const router = useRouter()
 
   return (
@@ -39,7 +39,7 @@ export default function ConceptDetail({ concept }) {
                 <button
                   key={slug}
                   className="zettel-card zettel-card--related"
-                  onClick={() => router.push(`/${slug}`)}
+                  onClick={() => router.push(conceptSlugs.has(slug) ? `/concept/${slug}` : `/${slug}`)}
                 >
                   <span className="zettel-card-label">{label}</span>
                   <span className="zettel-card-arrow">→</span>
