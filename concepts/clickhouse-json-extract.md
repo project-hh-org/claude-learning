@@ -6,8 +6,8 @@ tags: ["clickhouse", "sql", "json", "analytics"]
 related:
   - slug: "2026-05-07-clickhouse-terminal-access"
     label: "ClickHouse 터미널 접속"
-created: "2026-05-17"
-updated: "2026-05-17"
+created: "2026-05-15"
+updated: "2026-05-15"
 ---
 
 ## 왜 필요한가

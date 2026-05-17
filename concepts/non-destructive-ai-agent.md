@@ -5,8 +5,8 @@ stage: "evergreen"
 tags: ["ai-agent", "design-principle", "safety", "human-in-the-loop", "automation"]
 related:
   - "hybrid-reflection-loop"
-created: "2026-05-17"
-updated: "2026-05-17"
+created: "2026-05-12"
+updated: "2026-05-08"
 ---
 
 ## 정의
