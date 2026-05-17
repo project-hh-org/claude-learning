@@ -6,8 +6,8 @@ tags: ["claude-code", "claude-cli", "agent", "debugging", "mcp"]
 related:
   - "claude-code-hooks"
   - "ralph-loop"
-created: "2026-05-17"
-updated: "2026-05-17"
+created: "2026-05-12"
+updated: "2026-05-12"
 ---
 
 ## 핵심 개념

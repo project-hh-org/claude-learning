@@ -4,8 +4,8 @@ type: "concept"
 stage: "evergreen"
 tags: ["search", "data-quality", "silent-failure", "ai-agent"]
 related: []
-created: "2026-05-17"
-updated: "2026-05-17"
+created: "2026-05-14"
+updated: "2026-05-11"
 ---
 
 # 검색 Phantom Match 패턴

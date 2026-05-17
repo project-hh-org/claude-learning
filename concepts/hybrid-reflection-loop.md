@@ -7,8 +7,8 @@ related:
   - "reflection-loop"
   - "ralph-loop"
   - "ai-agent-loop-patterns"
-created: "2026-05-17"
-updated: "2026-05-17"
+created: "2026-05-12"
+updated: "2026-05-08"
 ---
 
 ## 정의
