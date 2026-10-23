@@ -63,6 +63,9 @@ description: "Use proactively whenever the user has just learned, asked about, o
 title: "<개념 이름 (사람이 부르는 자연어 그대로)>"
 type: "concept"
 stage: "seedling"
+category: "<AI | DevTools | Engineering 중 하나>"
+summary: "<포트폴리오 /lab 목록에 보일 한두 문장>"
+publish: false
 tags: ["<관련 태그 1~3개>"]
 related:
   - "<연관된 entry slug 또는 다른 concept slug, 0~3개>"
@@ -93,6 +96,7 @@ source: "claude-code" | "claude-desktop"
 - **공개 저장소 규칙 준수**: 회사명/내부 식별자/자격증명/내부 도메인 일반화
 - **사실 위주**: 사용자의 개인적 어조나 회고는 entries/ 영역. concepts는 사실 정보만
 - **stage는 항상 seedling**: 사용자가 발전시키면 직접 budding/evergreen으로 올림. 자동으로 올리지 마라
+- **publish는 항상 false**: `true`면 세션 종료 시 포트폴리오 `/lab`에 공개 PR이 열린다. 사용자가 직접 바꾼다. 자동으로 true로 쓰지 마라
 - **너무 많이 쪼개지 마라**: "X가 뭐야"에 대한 답변이 짧은 사실 하나라면, 굳이 새 concept을 만들지 않는다. 재사용 가치가 있을 때만 저장
 - **본문 응답 흐름 보존**: 사용자에게는 짧게 알리고 원래 작업 계속
 
