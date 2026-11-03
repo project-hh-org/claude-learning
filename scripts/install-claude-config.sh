@@ -158,7 +158,7 @@ cfg.hooks.Stop ??= []
 
 const desired = {
   matcher: '.*',
-  hooks: [{ type: 'command', command: 'bash ' + hookCommand }],
+  hooks: [{ type: 'command', command: 'bash "' + hookCommand + '"' }],
 }
 
 const already = (cfg.hooks.Stop || []).some(group =>

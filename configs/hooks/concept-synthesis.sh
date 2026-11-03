@@ -2,35 +2,45 @@
 # =============================================================
 # concept-synthesis.sh
 #
-# Claude Code Stop hook — 세션 종료 시 JSONL을 스캔해 사용자가
+# Claude Code Stop hook — 턴이 끝날 때마다 JSONL을 스캔해 사용자가
 # "정의/원리"를 학습한 순간(Q&A 쌍)을 추출하고 concepts/_unsorted/
 # 에 seedling 후보를 떨군다. capture-concept skill이 1차로 잡지
 # 못한 것을 종합 합성으로 보강하는 안전망.
+# 세션당 파일 하나를 갱신하므로 턴마다 파일이 늘어나지 않는다.
 #
-# 등록 (~/.claude/settings.json):
+# 등록 (~/.claude/settings.json, 경로에 공백이 있으면 따옴표 필수):
 #   "hooks": {
 #     "Stop": [{
-#       "matcher": ".*",
 #       "hooks": [{
 #         "type": "command",
-#         "command": "bash <repo>/configs/hooks/concept-synthesis.sh"
+#         "command": "bash \"<repo>/configs/hooks/concept-synthesis.sh\""
 #       }]
 #     }]
 #   }
 #
 # stdin: Claude Code가 hook event JSON을 보냄
+#        (session_id, cwd, transcript_path 포함)
 # =============================================================
 
 set -euo pipefail
 
 EVENT_JSON="$(cat)"
-SESSION_ID="$(echo "$EVENT_JSON" | grep -o '"session_id":"[^"]*"' | head -1 | cut -d'"' -f4 || true)"
-CWD="$(echo "$EVENT_JSON" | grep -o '"cwd":"[^"]*"' | head -1 | cut -d'"' -f4 || pwd)"
+FIELDS="$(printf '%s' "$EVENT_JSON" | node -e '
+let e = {}
+try { e = JSON.parse(require("fs").readFileSync(0, "utf-8")) } catch {}
+console.log([e.session_id, e.cwd, e.transcript_path].map(v => v || "").join("\n"))
+')" || exit 0
+# $(...)가 끝의 빈 줄을 지워 read가 EOF를 만나도 변수는 빈 값으로 채워진다.
+{ IFS= read -r SESSION_ID; IFS= read -r CWD; IFS= read -r JSONL; } <<< "$FIELDS" || true
 
 [ -z "$SESSION_ID" ] && exit 0
+[ -z "$CWD" ] && CWD="$(pwd)"
 
-ENCODED_CWD="$(echo "$CWD" | sed 's|/|-|g')"
-JSONL="$HOME/.claude/projects/${ENCODED_CWD}/${SESSION_ID}.jsonl"
+# transcript_path가 없을 때만 직접 계산
+if [ -z "$JSONL" ]; then
+  ENCODED_CWD="$(printf '%s' "$CWD" | sed 's/[^a-zA-Z0-9]/-/g')"
+  JSONL="$HOME/.claude/projects/${ENCODED_CWD}/${SESSION_ID}.jsonl"
+fi
 
 [ ! -f "$JSONL" ] && exit 0
 
@@ -47,12 +57,12 @@ UNSORTED_DIR="$REPO_ROOT/concepts/_unsorted"
 mkdir -p "$UNSORTED_DIR"
 
 TODAY="$(date +%Y-%m-%d)"
-NOW_TS="$(date +%H%M%S)"
+SESSION_SHORT="${SESSION_ID:0:8}"
 
-node - "$JSONL" "$UNSORTED_DIR" "$REPO_ROOT/concepts" "$TODAY" "$NOW_TS" <<'NODE' || exit 0
+node - "$JSONL" "$UNSORTED_DIR" "$REPO_ROOT/concepts" "$TODAY" "$SESSION_SHORT" <<'NODE' || exit 0
 const fs = require('fs')
 const path = require('path')
-const [, , jsonlPath, outDir, conceptsDir, today, ts] = process.argv
+const [, , jsonlPath, outDir, conceptsDir, today, sessionShort] = process.argv
 
 // ── 사용자가 정의를 묻는 패턴 ─────────────────────────────
 const DEF_PATTERNS = [
@@ -130,13 +140,16 @@ for (let i = 0; i < events.length - 1; i++) {
 if (candidates.length === 0) process.exit(0)
 
 // ── concepts/_unsorted/ 에 후보 파일 생성 ─────────────────
-const fname = `${today}-synthesis-${ts}.md`
+// 세션당 파일 하나. 첫 생성일을 유지하고, 내용이 같으면 다시 쓰지 않는다.
+const existing = fs.readdirSync(outDir).find(f => f.endsWith(`-synthesis-${sessionShort}.md`))
+const fname = existing || `${today}-synthesis-${sessionShort}.md`
+const fileDate = fname.slice(0, 10)
 const out = path.join(outDir, fname)
 
 const body = [
   '---',
-  `title: "[concept-synthesis] 합성 후보 ${today}"`,
-  `date: "${today}"`,
+  `title: "[concept-synthesis] 합성 후보 ${fileDate}"`,
+  `date: "${fileDate}"`,
   'kind: "concept-candidates"',
   `source: "claude-code"`,
   'stage: "seedling"',
@@ -169,6 +182,8 @@ const body = [
     ].join('\n')
   }),
 ].join('\n')
+
+if (existing && fs.readFileSync(out, 'utf-8') === body) process.exit(0)
 
 fs.writeFileSync(out, body, 'utf-8')
 console.error(`[concept-synthesis] ${candidates.length} candidate(s) → ${out}`)

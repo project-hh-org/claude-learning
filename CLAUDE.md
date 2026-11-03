@@ -294,8 +294,8 @@ SCOPE=project bash scripts/install-claude-config.sh   # <repo>/.claude/...에 (p
 | Skill | `configs/skills/capture-concept/SKILL.md` | 학습 시그널 즉시 concepts/에 seedling 저장 |
 | Rule | `configs/rules/capture-ideas.md` | capture-idea 발동 강제 |
 | Rule | `configs/rules/capture-concepts.md` | capture-concept 발동 강제 |
-| Stop hook (안전망) | `configs/hooks/idea-safety-net.sh` | 세션 끝에 thinking 후처리 → `ideas/_unsorted/` |
-| Stop hook (합성) | `configs/hooks/concept-synthesis.sh` | 세션 끝에 정의 Q&A 추출 → `concepts/_unsorted/` |
+| Stop hook (안전망) | `configs/hooks/idea-safety-net.sh` | 턴 끝마다 thinking·본문 후처리 → `ideas/_unsorted/` (세션당 파일 1개, gitignore) |
+| Stop hook (합성) | `configs/hooks/concept-synthesis.sh` | 턴 끝마다 정의 Q&A 추출 → `concepts/_unsorted/` (세션당 파일 1개, gitignore) |
 
 `_unsorted/` 폴더의 후보는 사용자가 검토 후 정식 위치로 옮기거나 삭제한다.
 
@@ -355,7 +355,7 @@ bash scripts/bootstrap.sh   # npm install + install-claude-config.sh 묶음 실�
 이 저장소는 **외부에 공개**된다. 모든 파일 작성 시 아래를 반드시 준수한다.
 
 **절대 포함 금지:**
-- 회사/서비스 고유 명칭 (예: `dahee`, `project-hh` 등 내부 식별자)
+- 회사/서비스 고유 명칭 (재직 이력이 있는 회사명·내부 코드네임 등 식별자)
 - AWS Secret ID, ARN 실제 값 → `YOUR_SECRET_ID`로 대체
 - 내부 도메인, IP, 계정 ID, 리소스 이름
 - API key, token, password 등 자격증명 실제 값

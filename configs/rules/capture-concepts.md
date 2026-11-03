@@ -61,4 +61,4 @@ tags: ["zettelkasten", "concepts", "automation", "ideation"]
 
 ## 누락 방지
 
-Stop hook(`configs/hooks/idea-safety-net.sh`)이 thinking 후처리로 누락된 ideation 후보를 잡아낸다. concept 학습 시그널은 thinking보다 본문에 명확히 드러나므로 안전망 의존도는 낮다 — 1차 책임은 응답 마무리 시점의 즉시 발동.
+Stop hook(`configs/hooks/idea-safety-net.sh`)이 thinking·본문 후처리로 누락된 ideation 후보를 잡아낸다. concept 학습 시그널은 thinking보다 본문에 명확히 드러나므로 안전망 의존도는 낮다 — 1차 책임은 응답 마무리 시점의 즉시 발동.

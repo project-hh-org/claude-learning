@@ -27,3 +27,7 @@ npm-debug.log*
 .obsidian/
 .trash/
 app.json
+
+# ── 자동 캡처 후보 (대화 원문 포함 — 공개 저장소에 올리지 않는다) ──
+ideas/_unsorted/
+concepts/_unsorted/
