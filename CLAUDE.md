@@ -4,9 +4,9 @@
 URL: https://claude-learning.project-hh.com  
 패키지 매니저: npm (package-lock.json 기준)
 
-> ⚠️ **Claude는 이 레포에서 git 명령을 실행하지 않는다.**  
-> 샌드박스가 iCloud .git 폴더를 공유하기 때문에 실패 시 `.git/index.lock`이 남아 충돌이 발생한다.  
-> 파일 읽기/쓰기만 수행하고, git add/commit/push는 항상 사용자 터미널에서 직접 실행한다.
+> ⚠️ **이 레포를 iCloud Drive 안에 두지 않는다.** 위치: `~/projects/claude-learning`, 기기 간 동기화는 GitHub로만 한다.  
+> iCloud가 `.git` 안의 파일을 내용 없는(dataless) 상태로 비우면 pack 파일이 깨진 것처럼 보이고 push까지 거절된다 ([[icloud-dataless-git-repo]]).  
+> 다른 기기에서는 iCloud 폴더를 쓰지 말고 `git clone` 후 `bash scripts/bootstrap.sh`로 셋업한다.
 
 ## 컴포넌트 컨벤션
 
@@ -102,7 +102,7 @@ scripts/
   setup-claude-desktop.sh       ← chat app: filesystem MCP + Custom Instructions 가이드
   install-launchd.sh            ← (선택) macOS 자동 push 워처
   watch-and-push.sh             ← (선택) 변경 감지 + 자동 commit/push
-  setup-git.sh                  ← (niche) iCloud 동기화 등으로 .git 빠진 경우만
+  setup-git.sh                  ← (niche) Zip 다운로드 등으로 .git 없이 받은 경우만
   generate-sitemap.mjs          ← 빌드 시 sitemap.xml 생성
 public/
 TEMPLATE.md         ← entry 작성 템플릿
