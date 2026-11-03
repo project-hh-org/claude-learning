@@ -100,8 +100,8 @@ scripts/
   bootstrap.sh                  ← 새 기기 1회 셋업 (npm install + claude config)
   install-claude-config.sh      ← Code: skills/rules/commands 심볼릭 링크 + Stop hook + vault 경로 기록
   setup-claude-desktop.sh       ← chat app: filesystem MCP + Custom Instructions 가이드
-  install-launchd.sh            ← (선택) macOS 자동 push 워처
-  watch-and-push.sh             ← (선택) 변경 감지 + 자동 commit/push
+  install-launchd.sh            ← macOS 로그인 시 워처 자동 시작 (launchd)
+  watch-and-push.sh             ← 노트 폴더 변경 감지 + 자동 commit/push
   setup-git.sh                  ← (niche) Zip 다운로드 등으로 .git 없이 받은 경우만
   generate-sitemap.mjs          ← 빌드 시 sitemap.xml 생성
 public/
@@ -371,7 +371,12 @@ bash scripts/bootstrap.sh   # npm install + install-claude-config.sh 묶음 실�
 
 ## 배포
 
-`entries/` 또는 `concepts/`에 파일 저장 → Obsidian Git 자동 push → GitHub Actions → S3 → CloudFront 자동 배포.
+`entries/` · `concepts/` · `ideas/` · `seeds/`에 파일 저장 → launchd 워처(`scripts/watch-and-push.sh`)가 4초 debounce 후 **그 4개 폴더만** commit + push → GitHub Actions → S3 → CloudFront 자동 배포.
+
+- 코드(`src/` 등)는 자동 커밋되지 않는다 — 직접 커밋한다. `_unsorted/`는 gitignore라 제외.
+- 설치(머신별 1회): `bash scripts/install-launchd.sh` · 로그: `tail -f /tmp/claude-learn-watcher.log` · 제거: `--uninstall`
+- `main` 브랜치에 있을 때만 동작한다.
+- push 보류 조건(노트 커밋은 로컬에 남고 로그에 경고): push 안 한 코드 커밋이 있을 때 / 원격이 앞서 있는데 코드 미커밋 변경이 있을 때 / rebase 충돌(자동 abort).
 
 수동 배포:
 ```bash

@@ -67,7 +67,13 @@ EOF
 
 # 로드
 launchctl unload "$PLIST_PATH" 2>/dev/null
+# launchctl load는 실패해도 0을 반환하는 경우가 있어 등록 여부를 직접 확인한다
 launchctl load "$PLIST_PATH"
+if ! launchctl list | grep -q "$PLIST_LABEL"; then
+  echo "❌ launchctl load 실패 (샌드박스/권한 문제일 수 있음). 터미널에서 직접 실행:"
+  echo "   launchctl load \"$PLIST_PATH\""
+  exit 1
+fi
 
 echo "✅ 자동 시작 등록 완료"
 echo "   로그: tail -f $LOG_PATH"
