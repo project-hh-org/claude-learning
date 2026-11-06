@@ -11,10 +11,14 @@
             "id": "58d93fa20c5d8b8a",
             "type": "leaf",
             "state": {
-              "type": "graph",
-              "state": {},
-              "icon": "lucide-git-fork",
-              "title": "그래프 뷰"
+              "type": "markdown",
+              "state": {
+                "file": "concepts/yarn-vs-pnpm.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "yarn-vs-pnpm"
             }
           }
         ]
@@ -37,7 +41,9 @@
               "type": "file-explorer",
               "state": {
                 "sortOrder": "alphabetical",
-                "autoReveal": false
+                "autoReveal": false,
+                "showSearch": false,
+                "searchQuery": ""
               },
               "icon": "lucide-folder-closed",
               "title": "파일 탐색기"
@@ -178,17 +184,35 @@
   },
   "active": "58d93fa20c5d8b8a",
   "lastOpenFiles": [
-    "scripts/obsidian-setup-and-watch.sh",
-    "entries/2026-05-07-zettelkasten-obsidian-blog.md",
-    "CONCEPT_TEMPLATE.md",
+    "concepts/tmux.md",
     "CLAUDE.md",
-    "2026-05-07.md",
-    "무제.canvas",
-    "TEMPLATE.md",
-    "public/og-image.png",
+    "entries/2026-05-17-claude-memory-misapplication.md",
+    "entries/2026-05-15-ai-agent-full-automation.md",
+    "entries/2026-05-12-ai-agent-debugging-silent-failure.md",
+    "entries/2026-05-08-ai-loop-reflection-ralph.md",
+    "entries/2026-05-07-zettelkasten-obsidian-blog.md",
+    "entries/2026-05-07-clickhouse-terminal-access.md",
+    "entries/2026-05-05-obsidian-git-auto-push.md",
+    "entries/2026-05-05-claude-code-setup-and-hooks.md",
+    "entries/2026-04-24-symlink-single-source.md",
+    "entries/2026-04-24-ship-tmux-multi-agent.md",
+    "concepts/ai-agent-loop-patterns.md",
+    "concepts/aws-cli-config.md",
+    "concepts/aws-secrets-manager-pattern.md",
+    "concepts/cdn-query-string-cache-key.md",
+    "concepts/claude-cli-allowed-tools.md",
+    "concepts/claude-code-hooks.md",
     "concepts/claude-md-architecture.md",
-    "concepts/tmux-wave-pattern.md",
-    "configs/rules/security.md",
+    "concepts/claude-project-memory.md",
+    "concepts/clickhouse-json-extract.md",
+    "concepts/debate-loop.md",
+    "concepts/generator-critic-loop.md",
+    "concepts/hybrid-reflection-loop.md",
+    "concepts/icloud-dataless-git-repo.md",
+    "concepts/macos-hangul-nfd-git-phantom.md",
+    "scripts/obsidian-setup-and-watch.sh",
+    "무제.canvas",
+    "public/og-image.png",
     "src/components/ConceptDetail.jsx",
     "src/app/concept/[slug]/page.jsx",
     "src/app/concept/[slug]",
@@ -197,11 +221,6 @@
     "src/app/entry",
     "src/lib/wikilink.js",
     "src/lib/concepts.js",
-    "concepts/aws-secrets-manager-pattern.md",
-    "concepts/symlink-single-source.md",
-    "concepts/claude-code-hooks.md",
-    "moc",
-    "concepts",
-    "entries/2026-04-24-ship-tmux-multi-agent.md"
+    "moc"
   ]
 }

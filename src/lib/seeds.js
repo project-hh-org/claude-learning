@@ -8,6 +8,7 @@ import remarkRehype from 'remark-rehype'
 import rehypeHighlight from 'rehype-highlight'
 import rehypeStringify from 'rehype-stringify'
 import { wikilinkToHtml } from './wikilink.js'
+import { toDateString } from './date.js'
 
 const SEEDS_DIR = path.join(process.cwd(), 'seeds')
 
@@ -75,7 +76,7 @@ export function getAllSeeds() {
       return {
         slug,
         title:                  data.title                  || slug,
-        date:                   data.date                   || slug.slice(0, 10),
+        date:                   toDateString(data.date)     || slug.slice(0, 10),
         scope:                  data.scope                  || 'standalone',
         source:                 data.source                 || null,
         origin_session_project: data.origin_session_project || null,
@@ -99,7 +100,7 @@ export async function getSeedBySlug(slug) {
   return {
     slug,
     title:                  data.title                  || slug,
-    date:                   data.date                   || slug.slice(0, 10),
+    date:                   toDateString(data.date)     || slug.slice(0, 10),
     scope:                  data.scope                  || 'standalone',
     source:                 data.source                 || null,
     origin_session_project: data.origin_session_project || null,

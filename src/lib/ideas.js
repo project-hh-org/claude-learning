@@ -8,6 +8,7 @@ import remarkRehype from 'remark-rehype'
 import rehypeHighlight from 'rehype-highlight'
 import rehypeStringify from 'rehype-stringify'
 import { wikilinkToHtml } from './wikilink.js'
+import { toDateString } from './date.js'
 
 const IDEAS_DIR = path.join(process.cwd(), 'ideas')
 
@@ -43,7 +44,7 @@ export function getAllIdeas() {
       return {
         slug,
         title:                  data.title                  || slug,
-        date:                   data.date                   || slug.slice(0, 10),
+        date:                   toDateString(data.date)     || slug.slice(0, 10),
         kind:                   data.kind                   || 'spark',
         scope:                  data.scope                  || 'current-project',
         source:                 data.source                 || null,
@@ -67,7 +68,7 @@ export async function getIdeaBySlug(slug) {
   return {
     slug,
     title:                  data.title                  || slug,
-    date:                   data.date                   || slug.slice(0, 10),
+    date:                   toDateString(data.date)     || slug.slice(0, 10),
     kind:                   data.kind                   || 'spark',
     scope:                  data.scope                  || 'current-project',
     source:                 data.source                 || null,

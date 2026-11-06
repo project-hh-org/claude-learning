@@ -53,6 +53,14 @@ description: "Use proactively whenever, during thinking, an ideation moment aris
 
 > Desktop chat app은 `setup-claude-desktop.sh`가 등록한 filesystem MCP의 root가 곧 vault root이므로 별도 path 조회 없이 그 root를 그대로 사용.
 
+### Aside 에이전트에서 발동한 경우 — 공개 폴더에 쓰지 않는다
+
+당신이 Aside 앱의 에이전트이거나 작업 디렉토리가 `~/.aside/` 아래라면:
+
+- ideas·seeds 모두 `<vault-root>/ideas/_unsorted/<YYYY-MM-DD>-<slug>.md`에 저장 (gitignore된 비공개 영역). 템플릿은 분류대로 쓰되 `scope`로 구분한다
+- **`ideas/`·`seeds/` 바로 아래에 쓰지 않는다** — 저장 즉시 워처가 공개 레포로 자동 push하고, Aside 세션은 회사 업무 맥락이 많다
+- `source: "aside"`로 적는다. 파일 쓰기는 `write_file`(또는 bash). 알림은 `→ ideas/_unsorted/<파일명> (검토 대기)`
+
 ---
 
 ## 템플릿 1: `ideas/<slug>.md` (현재 프로젝트 맥락)
@@ -63,7 +71,7 @@ title: "<한 줄 제목>"
 date: "<YYYY-MM-DD>"
 kind: "spark" | "buildable"        # spark: 스치는 생각 / buildable: 만들어볼만한 것
 scope: "current-project"
-source: "claude-code" | "claude-desktop"
+source: "claude-code" | "claude-desktop" | "aside"
 source_session_project: "<현재 작업 중인 프로젝트 식별자, 예: claude-learning>"
 stage: "seedling"
 tags: ["<관련 태그 0~3개>"]
@@ -90,7 +98,7 @@ title: "<프로젝트 가제>"
 date: "<YYYY-MM-DD>"
 kind: "buildable"
 scope: "standalone"
-source: "claude-code" | "claude-desktop"
+source: "claude-code" | "claude-desktop" | "aside"
 origin_session_project: "<발상이 떠오른 시점의 작업 프로젝트>"
 stage: "seedling"
 tags: ["<카테고리 태그>"]

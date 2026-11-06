@@ -1,4 +1,8 @@
 {
   "promptDelete": false,
-  "userIgnoreFilters": ["node_modules", ".next", "out"]
+  "userIgnoreFilters": [
+    "node_modules",
+    ".next",
+    "out"
+  ]
 }

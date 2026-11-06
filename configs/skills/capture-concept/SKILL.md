@@ -56,6 +56,15 @@ description: "Use proactively whenever the user has just learned, asked about, o
 
 > Desktop chat app은 `setup-claude-desktop.sh`가 등록한 filesystem MCP의 root가 곧 vault root.
 
+### Aside 에이전트에서 발동한 경우 — 공개 폴더에 쓰지 않는다
+
+당신이 Aside 앱의 에이전트이거나 작업 디렉토리가 `~/.aside/` 아래라면:
+
+- 저장 경로는 `<vault-root>/concepts/_unsorted/<slug>.md` (gitignore된 비공개 영역). **`concepts/` 바로 아래에 쓰지 않는다**
+- 이유: `concepts/`는 저장 즉시 워처가 공개 레포로 자동 push한다. Aside 세션은 회사 업무 맥락이 많아 검토 없이 공개되면 안 된다
+- `source: "aside"`로 적는다. 같은 슬러그 확인은 `concepts/`와 `concepts/_unsorted/` 둘 다 본다
+- 파일 쓰기는 `write_file`(또는 bash). 알림은 `→ concepts/_unsorted/<slug>.md (검토 대기)`
+
 ## 템플릿
 
 ```markdown
@@ -71,7 +80,7 @@ related:
   - "<연관된 entry slug 또는 다른 concept slug, 0~3개>"
 created: "<오늘 날짜 YYYY-MM-DD>"
 updated: "<오늘 날짜 YYYY-MM-DD>"
-source: "claude-code" | "claude-desktop"
+source: "claude-code" | "claude-desktop" | "aside"
 ---
 
 ## 한 줄 정의

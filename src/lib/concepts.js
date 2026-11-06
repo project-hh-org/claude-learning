@@ -8,6 +8,7 @@ import remarkRehype from 'remark-rehype'
 import rehypeHighlight from 'rehype-highlight'
 import rehypeStringify from 'rehype-stringify'
 import { wikilinkToHtml } from './wikilink.js'
+import { toDateString } from './date.js'
 
 const CONCEPTS_DIR = path.join(process.cwd(), 'concepts')
 
@@ -40,8 +41,8 @@ export function getAllConcepts() {
         stage:    data.stage    || 'seedling',
         tags:     data.tags     || [],
         related:  data.related  || [],
-        created:  data.created  || null,
-        updated:  data.updated  || null,
+        created:  toDateString(data.created) || null,
+        updated:  toDateString(data.updated) || null,
       }
     })
     .sort((a, b) => (b.updated || '').localeCompare(a.updated || ''))
@@ -63,8 +64,8 @@ export async function getConceptBySlug(slug) {
     stage:       data.stage    || 'seedling',
     tags:        data.tags     || [],
     related:     data.related  || [],
-    created:     data.created  || null,
-    updated:     data.updated  || null,
+    created:     toDateString(data.created) || null,
+    updated:     toDateString(data.updated) || null,
     contentHtml,
   }
 }

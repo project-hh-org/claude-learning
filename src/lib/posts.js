@@ -8,6 +8,7 @@ import remarkRehype from 'remark-rehype'
 import rehypeHighlight from 'rehype-highlight'
 import rehypeStringify from 'rehype-stringify'
 import { wikilinkToHtml, extractWikilinks } from './wikilink.js'
+import { toDateString } from './date.js'
 
 const ENTRIES_DIR = path.join(process.cwd(), 'entries')
 
@@ -40,7 +41,7 @@ export function getAllPosts() {
     return {
       slug,
       title:    data.title    || slug,
-      date:     data.date     || slug.slice(0, 10),
+      date:     toDateString(data.date) || slug.slice(0, 10),
       summary:  data.summary  || '',
       tags:     data.tags     || [],
       type:     data.type     || 'note',
@@ -122,7 +123,7 @@ export async function getPostBySlug(slug) {
   return {
     slug,
     title:      data.title      || slug,
-    date:       data.date       || slug.slice(0, 10),
+    date:       toDateString(data.date) || slug.slice(0, 10),
     summary:    data.summary    || '',
     tags:       data.tags       || [],
     type:       data.type       || 'note',
