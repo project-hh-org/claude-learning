@@ -1,16 +1,19 @@
 ---
-title: "iCloud dataless 파일과 git 저장소 손상"
-type: "concept"
-stage: "seedling"
-category: "DevTools"
-summary: "iCloud Drive가 .git 안의 파일을 내용 없는(dataless) 상태로 비워 두면, git은 pack 파일을 손상으로 오인하고 push까지 거절당한다."
-publish: false
-tags: ["git", "icloud", "macos"]
+title: iCloud dataless 파일과 git 저장소 손상
+type: concept
+stage: seedling
+category: DevTools
+summary: iCloud Drive가 .git 안의 파일을 내용 없는(dataless) 상태로 비워 두면, git은 pack 파일을 손상으로 오인하고 push까지 거절당한다.
+publish: true
+tags:
+  - git
+  - icloud
+  - macos
 related:
-  - "macos-hangul-nfd-git-phantom"
-created: "2026-11-03"
-updated: "2026-11-03"
-source: "claude-code"
+  - macos-hangul-nfd-git-phantom
+created: 2026-11-03
+updated: 2026-11-03
+source: claude-code
 ---
 
 ## 한 줄 정의
