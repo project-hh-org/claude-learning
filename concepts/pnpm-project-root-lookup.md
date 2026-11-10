@@ -26,7 +26,7 @@ pnpm은 명령을 실행한 **현재 폴더부터 시작해 상위로 거슬러 
 - 그래서 `package.json`이 없는 래퍼 폴더(저장소를 한 겹 감싼 폴더 등)에서 `pnpm install`을 실행하면, 상위 어딘가에 잘못 놓인 `package.json`을 프로젝트로 인식하고 **그 자리에** `node_modules`·`pnpm-lock.yaml`을 만든다.
 - `pnpm-workspace.yaml`도 같은 방식으로 위로 탐색된다. 상위 폴더에 이 파일이 생기면 하위 프로젝트들이 그곳을 workspace 루트로 오인할 수 있다. 한 번 생긴 잔해가 다음 사고를 부르는 구조다.
 - pnpm 10부터는 의존성의 build script(postinstall 등)를 기본으로 차단한다. 차단된 패키지가 있으면 `pnpm-workspace.yaml`에 `allowBuilds: <pkg>: set this to true or false` 같은 자리표시를 자동으로 만들 수 있다. 직접 만든 적 없는 workspace 파일이 생겼다면 이 동작을 의심해 볼 것.
-- `pnpm`이 corepack shim이면 corepack도 위로 올라가며 `packageManager` 필드를 찾는다. 그래서 폴더마다 다른 pnpm 버전이 실행될 수 있다. 출력의 `using pnpm vX`로 확인한다 → [[corepack-package-manager-field]]
+- `pnpm`이 corepack shim이면 corepack도 위로 올라가며 `packageManager` 필드를 찾는다. 그래서 폴더마다 다른 pnpm 버전이 실행될 수 있다. 출력의 `using pnpm vX`로 확인한다. 자세한 건 [[corepack-package-manager-field|corepack의 버전 고정 방식]] 참고.
 
 ## 예시
 
@@ -48,7 +48,7 @@ pnpm은 명령을 실행한 **현재 폴더부터 시작해 상위로 거슬러 
 
 ## 더 알아볼 것
 
-- npm·yarn의 상위 탐색과 멈추는 조건 비교 → [[npm-yarn-root-lookup]]
-- 탐색 시작점과 대상 범위를 지정하는 `-C`, `-w`, `-r`, `--filter` → [[pnpm-workspace-cli-flags]]
-- corepack과 `packageManager` 필드로 버전을 고정하는 방식 → [[corepack-package-manager-field]]
-- 기본 비교: [[yarn-vs-pnpm]]
+- [[npm-yarn-root-lookup|npm·yarn의 상위 탐색과 멈추는 조건 비교]]
+- [[pnpm-workspace-cli-flags|탐색 시작점과 대상 범위를 지정하는 -C, -w, -r, --filter]]
+- [[corepack-package-manager-field|corepack과 packageManager 필드로 버전을 고정하는 방식]]
+- [[yarn-vs-pnpm|yarn vs pnpm 기본 비교]]

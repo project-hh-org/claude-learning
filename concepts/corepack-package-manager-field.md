@@ -57,4 +57,5 @@ cd ~/dev/wrapper/app && pnpm install # "using pnpm v10.33.0" — package.json의
 
 - 최신 Node.js 릴리스에서 corepack이 기본 포함되는지 [검증 필요] — Node.js 릴리스 노트에서 corepack 항목 확인
 - pnpm 자체의 버전 관리 기능(`manage-package-manager-versions` 설정)과 corepack이 어떻게 겹치는지 [검증 필요] — pnpm 설정 문서 확인
-- 루트 탐색 비교: [[pnpm-project-root-lookup]], [[npm-yarn-root-lookup]]
+- [[pnpm-project-root-lookup|pnpm의 루트 탐색]]
+- [[npm-yarn-root-lookup|npm·yarn의 루트 탐색 비교]]
