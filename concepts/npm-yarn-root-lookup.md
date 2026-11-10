@@ -4,7 +4,7 @@ type: "concept"
 stage: "seedling"
 category: "DevTools"
 summary: "npm과 yarn classic도 현재 폴더에서 위로 올라가며 루트를 찾는다. 단 npm은 package.json뿐 아니라 node_modules 폴더만 있어도 멈추고, 아무것도 없으면 현재 폴더를 루트로 쓴다."
-publish: false
+publish: true
 tags: ["npm", "yarn", "package-manager"]
 related:
   - "pnpm-project-root-lookup"

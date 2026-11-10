@@ -4,7 +4,7 @@ type: "concept"
 stage: "seedling"
 category: "DevTools"
 summary: "pnpm의 루트 자동 탐색을 덮어쓰거나 범위를 좁히는 플래그. -C로 시작 폴더를 바꾸고, -w로 workspace 루트를, -r과 --filter로 대상 패키지를 고른다."
-publish: false
+publish: true
 tags: ["pnpm", "monorepo", "cli"]
 related:
   - "pnpm-project-root-lookup"
@@ -47,8 +47,8 @@ pnpm -C ~/dev/wrapper/app install
 # 하위 패키지 폴더에서 루트에 devDependency 추가
 pnpm add -D -w typescript
 
-# admin 패키지와, admin에 의존하는 패키지만 빌드
-pnpm --filter "...admin" build
+# ui 패키지와, ui에 의존하는 패키지만 빌드
+pnpm --filter "...ui" build
 
 # main 이후 바뀐 패키지만 테스트, 매칭이 없으면 실패
 pnpm --filter "[origin/main]" --fail-if-no-match test

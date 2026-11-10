@@ -4,7 +4,7 @@ type: "concept"
 stage: "seedling"
 category: "DevTools"
 summary: "pnpm은 현재 폴더에서 시작해 상위로 올라가며 가장 가까운 package.json·pnpm-workspace.yaml을 루트로 잡는다. 프로젝트 모음 폴더에 package.json이 하나 섞이면 엉뚱한 곳에 node_modules가 생긴다."
-publish: false
+publish: true
 tags: ["pnpm", "package-manager", "monorepo"]
 related:
   - "yarn-vs-pnpm"

@@ -4,7 +4,7 @@ type: "concept"
 stage: "seedling"
 category: "DevTools"
 summary: "corepack은 pnpm·yarn 명령을 가로채는 shim이다. 상위로 올라가며 packageManager 필드가 있는 package.json을 찾고, 거기 적힌 버전을 받아서 실행한다. 같은 pnpm 명령이 폴더마다 다른 버전으로 도는 이유다."
-publish: false
+publish: true
 tags: ["corepack", "pnpm", "package-manager"]
 related:
   - "pnpm-project-root-lookup"
