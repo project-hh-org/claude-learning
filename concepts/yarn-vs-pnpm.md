@@ -3,7 +3,10 @@ title: "yarn vs pnpm 패키지 매니저 비교"
 type: "concept"
 stage: "evergreen"
 tags: ["npm", "yarn", "pnpm", "node", "package-manager", "monorepo"]
-related: []
+related:
+  - "pnpm-project-root-lookup"
+  - "npm-yarn-root-lookup"
+  - "corepack-package-manager-field"
 created: "2026-05-09"
 updated: "2026-05-09"
 ---
