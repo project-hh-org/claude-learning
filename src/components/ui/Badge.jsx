@@ -50,6 +50,12 @@ export function StageBadge({ stage }) {
   return <Badge variant={m.variant} emoji={m.emoji} label={m.label} />
 }
 
+// Learning Log 목록에서 entry와 concept을 구분하는 배지 — 색·이모지는 stage를 따른다
+export function ConceptBadge({ stage }) {
+  const m = STAGE_META[stage] || STAGE_META.seedling
+  return <Badge variant={m.variant} emoji={m.emoji} label="Concept" />
+}
+
 const CATEGORY_META = {
   rules:    { variant: 'orange', emoji: '📋', label: 'Rule' },
   hooks:    { variant: 'green',  emoji: '🪝', label: 'Hook' },

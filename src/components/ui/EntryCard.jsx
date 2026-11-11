@@ -3,6 +3,7 @@
  *
  * Card / CardBody / CardTitle / CardSummary / CardFooter atom을 조립.
  * 날짜 컬럼(.pc-date)은 EntryCard 전용이라 인라인 마크업으로 둠.
+ * badge: 제목 앞 배지 (MetaCard와 같은 방식, 예: concept의 StageBadge)
  */
 import Card from './Card'
 import CardBody from './CardBody'
@@ -21,7 +22,7 @@ function formatDate(dateStr) {
   }
 }
 
-export default function EntryCard({ date, title, summary, tags = [], onClick }) {
+export default function EntryCard({ date, badge, title, summary, tags = [], onClick }) {
   const { day, month } = formatDate(date)
   return (
     <Card onClick={onClick}>
@@ -30,7 +31,7 @@ export default function EntryCard({ date, title, summary, tags = [], onClick }) 
         <div className="pc-month">{month}</div>
       </div>
       <CardBody>
-        <CardTitle>{title}</CardTitle>
+        <CardTitle badge={badge}>{title}</CardTitle>
         <CardSummary>{summary}</CardSummary>
         {tags.length > 0 && (
           <CardFooter>

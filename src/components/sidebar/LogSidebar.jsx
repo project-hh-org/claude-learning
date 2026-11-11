@@ -16,7 +16,8 @@ export default function LogSidebar({ posts, tags = [], thisMonth, onTagClick }) 
     <>
       <div className="s-card">
         <h3>📊 통계</h3>
-        <div className="s-stat"><span className="l">전체 글</span><span className="v">{posts.length}</span></div>
+        <div className="s-stat"><span className="l">로그</span><span className="v">{posts.filter(p => p.kind !== 'concept').length}</span></div>
+        <div className="s-stat"><span className="l">개념 노트</span><span className="v">{posts.filter(p => p.kind === 'concept').length}</span></div>
         <div className="s-stat"><span className="l">이번 달</span><span className="v">{thisMonth}</span></div>
         <div className="s-stat"><span className="l">태그 수</span><span className="v">{tags.length}</span></div>
       </div>
@@ -35,7 +36,7 @@ export default function LogSidebar({ posts, tags = [], thisMonth, onTagClick }) 
         <div className="s-note">
           새로운 것을 배웠다면 Claude에게:<br />
           <em>&quot;오늘 [주제] 배웠어, 러닝 로그에 추가해줘&quot;</em><br /><br />
-          <code className="s-inline-code">entries/</code>에 .md 저장 → 자동 push → S3 배포
+          <code className="s-inline-code">entries/</code>(로그) · <code className="s-inline-code">concepts/</code>(개념)에 .md 저장 → 자동 push → S3 배포
         </div>
       </div>
       <div className="s-card">

@@ -39,6 +39,7 @@ export function getAllConcepts() {
         title:    data.title    || slug,
         type:     'concept',
         stage:    data.stage    || 'seedling',
+        summary:  data.summary  || '',
         tags:     data.tags     || [],
         related:  data.related  || [],
         created:  toDateString(data.created) || null,

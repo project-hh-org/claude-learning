@@ -7,6 +7,7 @@ import EntryCard from '../ui/EntryCard'
 import SearchInput from '../ui/SearchInput'
 import TagFilter from '../ui/TagFilter'
 import LogSidebar from '../sidebar/LogSidebar'
+import { ConceptBadge } from '../ui/Badge'
 
 export default function PostList({ posts }) {
   const router = useRouter()
@@ -25,7 +26,7 @@ export default function PostList({ posts }) {
       const matchTag = activeTag === 'all' || p.tags?.includes(activeTag)
       const matchQ   = !q ||
         p.title.toLowerCase().includes(q) ||
-        p.summary.toLowerCase().includes(q) ||
+        (p.summary || '').toLowerCase().includes(q) ||
         p.tags?.some(t => t.toLowerCase().includes(q))
       return matchTag && matchQ
     })
@@ -80,12 +81,13 @@ export default function PostList({ posts }) {
             <div className="year-label">{year}</div>
             {yearPosts.map(post => (
               <EntryCard
-                key={post.slug}
+                key={post.href}
                 date={post.date}
+                badge={post.kind === 'concept' ? <ConceptBadge stage={post.stage} /> : null}
                 title={post.title}
                 summary={post.summary}
                 tags={post.tags}
-                onClick={() => router.push(`/${post.slug}`)}
+                onClick={() => router.push(post.href)}
               />
             ))}
           </div>
