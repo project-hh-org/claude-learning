@@ -100,8 +100,10 @@ scripts/
   bootstrap.sh                  ← 새 기기 1회 셋업 (npm install + claude config)
   install-claude-config.sh      ← Code: skills/rules/commands 심볼릭 링크 + Stop hook + vault 경로 기록
   setup-claude-desktop.sh       ← chat app: filesystem MCP + Custom Instructions 가이드
-  install-launchd.sh            ← macOS 로그인 시 워처 자동 시작 (launchd)
-  watch-and-push.sh             ← 노트 폴더 변경 감지 + 자동 commit/push
+  install-launchd.sh            ← launchd 작업 2개: 워처(상주) + Aside 캡처(30분마다)
+  watch-and-push.sh             ← 노트·설정 폴더 변경 감지 + 공개 검사 + 자동 commit/push
+  public-scan.sh                ← 공개 검사 (자격증명·홈 경로·레포 밖 차단어 목록)
+  sync-claude-configs.mjs       ← configs/sync.json 공개 목록의 ~/.claude 설정을 configs/로 복사 (Stop hook)
   setup-git.sh                  ← (niche) Zip 다운로드 등으로 .git 없이 받은 경우만
   generate-sitemap.mjs          ← 빌드 시 sitemap.xml 생성
 public/
@@ -295,6 +297,8 @@ SCOPE=project bash scripts/install-claude-config.sh   # <repo>/.claude/...에 (p
 | Rule | `configs/rules/capture-ideas.md` | capture-idea 발동 강제 |
 | Rule | `configs/rules/capture-concepts.md` | capture-concept 발동 강제 |
 | Stop·SessionEnd hook (안전망) | `configs/hooks/llm-capture.sh` | 새 사용자 메시지 3개 이상 쌓이면(또는 세션 종료 시) 새 부분만 haiku에 넘겨 개념·발상 후보 추출 → `concepts/_unsorted/`·`ideas/_unsorted/` (후보당 파일 1개, gitignore). 로그: `~/.claude/learning-capture/capture.log` |
+| launchd 30분 작업 (Aside) | `llm-capture.sh --aside-sweep` | Aside는 hook이 없어 `~/.aside/u/0/sessions/*/messages.jsonl`을 주기적으로 훑는다. 바이트 오프셋으로 새 부분만, 설치 시점 이전 대화는 처리 안 함. 결과는 `source: "aside"` |
+| Command | `configs/commands/review-captures.md` | `/review-captures` — `_unsorted` 후보를 골라 일반화·공개 검사 후 공개 폴더로 승격 |
 
 `_unsorted/` 폴더의 후보는 사용자가 검토 후 정식 위치로 옮기거나 삭제한다.
 
@@ -372,10 +376,12 @@ bash scripts/bootstrap.sh   # npm install + install-claude-config.sh 묶음 실�
 
 ## 배포
 
-`entries/` · `concepts/` · `ideas/` · `seeds/`에 파일 저장 → launchd 워처(`scripts/watch-and-push.sh`)가 4초 debounce 후 **그 4개 폴더만** commit + push → GitHub Actions → S3 → CloudFront 자동 배포.
+`entries/` · `concepts/` · `ideas/` · `seeds/` · `configs/`에 파일 저장 → launchd 워처(`scripts/watch-and-push.sh`)가 4초 debounce 후 **그 5개 폴더만** 공개 검사(`scripts/public-scan.sh`) → commit + push → GitHub Actions → S3 → CloudFront 자동 배포.
 
-- 코드(`src/` 등)는 자동 커밋되지 않는다 — 직접 커밋한다. `_unsorted/`는 gitignore라 제외.
-- 설치(머신별 1회): `bash scripts/install-launchd.sh` · 로그: `tail -f /tmp/claude-learn-watcher.log` · 제거: `--uninstall`
+- 코드(`src/`, `scripts/` 등)는 자동 커밋되지 않는다 — 직접 커밋한다. `_unsorted/`는 gitignore라 제외.
+- `configs/`는 감시 대상이라 레포 안 hook·스킬을 고치는 도중의 내용도 저장 즉시 공개된다.
+- 공개 검사 차단어 목록(회사명 등)은 레포 밖 `~/.claude/learning-capture/public-denylist.txt`에 둔다.
+- 설치(머신별 1회): `bash scripts/install-launchd.sh` (워처 + Aside 캡처) · 로그: `tail -f /tmp/claude-learn-watcher.log` · 제거: `--uninstall`
 - `main` 브랜치에 있을 때만 동작한다.
 - push 보류 조건(노트 커밋은 로컬에 남고 로그에 경고): push 안 한 코드 커밋이 있을 때 / 원격이 앞서 있는데 코드 미커밋 변경이 있을 때 / rebase 충돌(자동 abort).
 
