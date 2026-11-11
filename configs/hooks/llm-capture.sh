@@ -15,12 +15,19 @@
 #   - 모델 호출은 백그라운드 — hook 자체는 바로 끝난다
 #   - 결과는 gitignore된 _unsorted/에만 쓴다 (공개 전 사람이 검토)
 #
+# Aside 모드 (--aside-sweep, launchd가 30분마다 실행 — scripts/install-launchd.sh):
+#   - Aside는 hook이 없으므로 ~/.aside/u/0/sessions/*/messages.jsonl을 주기적으로 훑는다
+#   - 세션별 처리 위치는 바이트 오프셋 — 파일 크기만 보고 바뀐 세션의 새 부분만 읽는다
+#   - 첫 실행은 현재 크기를 기준점으로만 기록한다 (과거 대화는 처리하지 않음)
+#   - 새 사용자 메시지 MIN_USER_TURNS 이상, 또는 2시간 넘게 멈춘 세션이면 처리
+#   - 결과 파일은 source: "aside"
+#
 # 등록 (~/.claude/settings.json — install-claude-config.sh가 머지):
 #   "Stop":       [{ "hooks": [{ "type": "command", "command": "bash \"<repo>/configs/hooks/llm-capture.sh\"" }] }]
 #   "SessionEnd": [{ "hooks": [{ "type": "command", "command": "bash \"<repo>/configs/hooks/llm-capture.sh\"" }] }]
 #
 # 로그: ~/.claude/learning-capture/capture.log
-# 테스트용 vault·상태 폴더 지정: LEARNING_VAULT=<dir> LEARNING_CAPTURE_STATE=<dir>
+# 테스트용: LEARNING_VAULT=<dir> LEARNING_CAPTURE_STATE=<dir> ASIDE_SESSIONS=<dir>
 # =============================================================
 
 set -uo pipefail
@@ -46,7 +53,7 @@ if [ "${1:-}" = "--extract" ]; then
 
   SCHEMA='{"type":"object","properties":{"items":{"type":"array","maxItems":5,"items":{"type":"object","properties":{"kind":{"type":"string","enum":["concept","idea"]},"slug":{"type":"string"},"title":{"type":"string"},"summary":{"type":"string"},"tags":{"type":"array","items":{"type":"string"},"maxItems":3},"body":{"type":"string"}},"required":["kind","slug","title","summary","tags","body"]}}},"required":["items"]}'
 
-  PROMPT='너는 개발 학습 로그의 캡처 필터다. 입력은 Claude Code 대화의 일부다.
+  PROMPT='너는 개발 학습 로그의 캡처 필터다. 입력은 사용자와 AI 어시스턴트(Claude Code 또는 Aside 브라우저 에이전트) 대화의 일부다.
 사용자가 이 대화에서 새로 알게 된 재사용 가능한 개념·원리·패턴(kind=concept)과,
 대화 중 나온 만들어볼 만한 발상(kind=idea)만 골라 items로 반환하라.
 
@@ -69,10 +76,14 @@ if [ "${1:-}" = "--extract" ]; then
     exit 0
   fi
 
-  node - "$OUT" "$VAULT" "$(basename "$BATCH" .txt)" <<'NODE' >> "$LOG" 2>&1
+  # batch 이름이 aside-로 시작하면 Aside 세션에서 온 것
+  SOURCE="llm-capture"
+  case "$(basename "$BATCH")" in aside-*) SOURCE="aside" ;; esac
+
+  node - "$OUT" "$VAULT" "$(basename "$BATCH" .txt)" "$SOURCE" <<'NODE' >> "$LOG" 2>&1
 const fs = require('fs')
 const path = require('path')
-const [, , outPath, vault, batchName] = process.argv
+const [, , outPath, vault, batchName, source] = process.argv
 
 const res = JSON.parse(fs.readFileSync(outPath, 'utf-8'))
 if (res.is_error) { console.log(`[${batchName}] 모델 오류: ${res.subtype}`); process.exit(1) }
@@ -101,7 +112,7 @@ for (const it of items) {
     : [`date: "${today}"`, 'kind: "spark"', 'scope: "current-project"', 'stage: "seedling"',
        `summary: ${yq(it.summary)}`, `tags: ${tags}`]
   const md = ['---', `title: ${yq(it.title)}`, ...front,
-    'source: "llm-capture"', `capture_batch: ${yq(batchName)}`, '---', '', String(it.body || '').trim(), ''].join('\n')
+    `source: ${yq(source)}`, `capture_batch: ${yq(batchName)}`, '---', '', String(it.body || '').trim(), ''].join('\n')
   const dir = path.join(vault, it.kind === 'concept' ? 'concepts/_unsorted' : 'ideas/_unsorted')
   fs.mkdirSync(dir, { recursive: true })
   const file = path.join(dir, `${today}-${slug}.md`)
@@ -116,14 +127,102 @@ NODE
   exit 0
 fi
 
+# launchd(Aside 모드)에서는 작업이 끝나면 남은 자식 프로세스가 정리될 수 있어 추출을 앞에서 순서대로 돌린다
+SWEEP=0
+[ "${1:-}" = "--aside-sweep" ] && SWEEP=1
+run_extract() {
+  if [ "$SWEEP" = 1 ]; then bash "$0" --extract "$1"
+  else nohup bash "$0" --extract "$1" >/dev/null 2>&1 &
+  fi
+}
+
 # ── 실패로 남은 batch: 10분 지난 것은 재시도, 3일 지난 것은 정리 ──
 # (처리 위치는 batch를 만들 때 이미 넘어가므로, 남은 batch가 유일한 재시도 수단)
 find "$STATE_DIR/batches" -type f -mtime +3 -delete 2>/dev/null
 find "$STATE_DIR/batches" -name '*.txt' -mmin +10 2>/dev/null | while IFS= read -r OLD; do
   touch "$OLD"   # 재시도 중에 다음 hook이 또 띄우지 않도록
   log "batch 재시도: $(basename "$OLD")"
-  nohup bash "$0" --extract "$OLD" >/dev/null 2>&1 &
+  run_extract "$OLD"
 done
+
+# ── Aside 모드: 세션 파일의 새 부분을 batch로 잘라 순서대로 추출 ──
+if [ "$SWEEP" = 1 ]; then
+  ASIDE_SESSIONS="${ASIDE_SESSIONS:-$HOME/.aside/u/0/sessions}"
+  [ -d "$ASIDE_SESSIONS" ] || exit 0
+  node - "$STATE_DIR" "$ASIDE_SESSIONS" "$MIN_USER_TURNS" <<'NODE' > "$STATE_DIR/aside-batches.txt" 2>> "$LOG"
+const fs = require('fs')
+const path = require('path')
+const [, , stateDir, sessionsDir, minTurnsArg] = process.argv
+const IDLE_MS = 2 * 60 * 60 * 1000
+const MAX = 80000
+
+const asideState = path.join(stateDir, 'aside')
+fs.mkdirSync(asideState, { recursive: true })
+const baselineFile = path.join(asideState, '.baseline')
+const isBaseline = !fs.existsSync(baselineFile)
+
+for (const dir of fs.readdirSync(sessionsDir)) {
+  const file = path.join(sessionsDir, dir, 'messages.jsonl')
+  let st
+  try { st = fs.statSync(file) } catch { continue }
+  const stateFile = path.join(asideState, `${dir}.json`)
+  let offset = 0
+  try { offset = JSON.parse(fs.readFileSync(stateFile, 'utf-8')).offset || 0 } catch {}
+
+  // 첫 실행: 지금 크기를 기준점으로만 기록 (과거 대화는 처리하지 않음)
+  if (isBaseline) { fs.writeFileSync(stateFile, JSON.stringify({ offset: st.size })); continue }
+  if (st.size <= offset) continue
+
+  // 새로 붙은 부분만 읽는다. 쓰는 중인 마지막 줄은 다음 번으로 넘긴다
+  const fd = fs.openSync(file, 'r')
+  const buf = Buffer.alloc(st.size - offset)
+  fs.readSync(fd, buf, 0, buf.length, offset)
+  fs.closeSync(fd)
+  const lastNl = buf.lastIndexOf(0x0a)
+  if (lastNl < 0) continue
+  const end = offset + lastNl + 1
+
+  const turns = []
+  let userTurns = 0
+  for (const line of buf.subarray(0, lastNl).toString('utf-8').split('\n')) {
+    let e
+    try { e = JSON.parse(line) } catch { continue }
+    if (e.role === 'user' && typeof e.content === 'string' && e.content.trim()) {
+      userTurns++
+      turns.push(`### 사용자\n${e.content.trim()}`)
+    } else if (e.role === 'assistant' && Array.isArray(e.content)) {
+      const text = e.content.filter(b => b.type === 'text').map(b => b.text).join('\n').trim()
+      if (text) turns.push(`### Aside\n${text}`)
+    }
+  }
+
+  // 충분히 쌓였거나, 세션이 한동안 멈췄을 때만 처리 — 아니면 처리 위치를 그대로 두고 다음 번에 이어서 센다
+  const idle = Date.now() - st.mtimeMs > IDLE_MS
+  if (userTurns < Number(minTurnsArg) && !(idle && userTurns > 0)) {
+    if (userTurns === 0 && idle) fs.writeFileSync(stateFile, JSON.stringify({ offset: end }))
+    continue
+  }
+
+  let body = turns.join('\n\n')
+  if (body.length > MAX) body = body.slice(-MAX)
+  const batch = path.join(stateDir, 'batches', `aside-${dir}-${offset}-${end}.txt`)
+  fs.writeFileSync(batch, body, 'utf-8')
+  fs.writeFileSync(stateFile, JSON.stringify({ offset: end }))
+  console.log(batch)
+}
+
+if (isBaseline) {
+  fs.writeFileSync(baselineFile, new Date().toISOString())
+  console.error(`[aside] 기준점 기록: 세션 ${fs.readdirSync(asideState).length - 1}개 (과거 대화는 처리하지 않음)`)
+}
+NODE
+  while IFS= read -r B; do
+    [ -n "$B" ] || continue
+    log "batch 생성: $(basename "$B") ($(wc -c < "$B" | tr -d ' ')B)"
+    run_extract "$B"
+  done < "$STATE_DIR/aside-batches.txt"
+  exit 0
+fi
 
 # ── 1단계 (hook 본체): 새 대화 부분을 batch 파일로 잘라낸다 ──────
 EVENT_JSON="$(cat)"
