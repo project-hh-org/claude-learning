@@ -45,7 +45,12 @@ esac
 SETTINGS_FILE="$TARGET_BASE/settings.json"
 VAULT_PATH_FILE="$TARGET_BASE/learning-vault.path"
 HOOK_SCRIPT="$REPO_ROOT/configs/hooks/llm-capture.sh"
-HOOK_EVENTS=(Stop SessionEnd)
+SYNC_SCRIPT="$REPO_ROOT/scripts/sync-claude-configs.mjs"
+# 등록할 hook: "실행기|스크립트|이벤트,이벤트"
+HOOK_SPECS=(
+  "bash|$HOOK_SCRIPT|Stop,SessionEnd"   # 캡처 안전망
+  "node|$SYNC_SCRIPT|Stop"              # configs/sync.json 공개 목록 → configs/ 복사
+)
 # llm-capture.sh로 대체된 정규식 hook — settings.json에 남아 있으면 제거한다
 RETIRED_HOOKS=(idea-safety-net.sh concept-synthesis.sh)
 
@@ -83,6 +88,23 @@ ok "vault 경로 기록: $VAULT_PATH_FILE  →  $REPO_ROOT"
 echo "📁 설치 범위: $SCOPE  →  $TARGET_BASE"
 echo ""
 
+# configs/sync.json으로 ~/.claude에서 복사해 온 항목은 원본이 ~/.claude(iCloud 백업) 쪽이다.
+# 그 자리를 레포 링크로 바꾸면 원본이 지워지므로 링크 대상에서 뺀다.
+SYNC_MANIFEST="$REPO_ROOT/configs/.sync-manifest.json"
+is_synced_copy() { [ -f "$SYNC_MANIFEST" ] && grep -qF "\"$1\"" "$SYNC_MANIFEST"; }
+
+# target 자리에 레포 링크를 건다. 기존 링크만 교체하고, 실제 파일·폴더는 절대 지우지 않는다.
+link_into() {
+  local src="$1" target="$2" kind="$3"
+  if [ -e "$target" ] && [ ! -L "$target" ]; then
+    warn "$kind skip: $target 는 실제 파일/폴더 — 덮어쓰지 않음"
+    return 0
+  fi
+  rm -f "$target"
+  ln -s "$src" "$target"
+  ok "$kind 등록: $target  →  $src"
+}
+
 # ── Skills 심볼릭 링크 ──────────────────────────────────────
 SKILLS_SRC="$REPO_ROOT/configs/skills"
 if [ -d "$SKILLS_SRC" ]; then
@@ -90,13 +112,8 @@ if [ -d "$SKILLS_SRC" ]; then
     [ -d "$skill_dir" ] || continue
     name="$(basename "$skill_dir")"
     [ -f "$skill_dir/SKILL.md" ] || { warn "skip $name (SKILL.md 없음)"; continue; }
-
-    target="$TARGET_BASE/skills/$name"
-    if [ -L "$target" ] || [ -e "$target" ]; then
-      rm -f "$target"
-    fi
-    ln -s "$skill_dir" "$target"
-    ok "skill 등록: $target  →  $skill_dir"
+    is_synced_copy "skills/$name" && continue
+    link_into "$skill_dir" "$TARGET_BASE/skills/$name" skill
   done
 fi
 
@@ -106,13 +123,8 @@ if [ -d "$RULES_SRC" ]; then
   for rule_file in "$RULES_SRC"/*.md; do
     [ -f "$rule_file" ] || continue
     name="$(basename "$rule_file")"
-
-    target="$TARGET_BASE/rules/$name"
-    if [ -L "$target" ] || [ -e "$target" ]; then
-      rm -f "$target"
-    fi
-    ln -s "$rule_file" "$target"
-    ok "rule 등록: $target  →  $rule_file"
+    is_synced_copy "rules/$name" && continue
+    link_into "$rule_file" "$TARGET_BASE/rules/$name" rule
   done
 fi
 
@@ -122,26 +134,20 @@ if [ -d "$COMMANDS_SRC" ]; then
   for cmd_file in "$COMMANDS_SRC"/*.md; do
     [ -f "$cmd_file" ] || continue
     name="$(basename "$cmd_file")"
-
-    target="$TARGET_BASE/commands/$name"
-    if [ -L "$target" ] || [ -e "$target" ]; then
-      rm -f "$target"
-    fi
-    ln -s "$cmd_file" "$target"
-    ok "command 등록: $target  →  $cmd_file"
+    is_synced_copy "commands/$name" && continue
+    link_into "$cmd_file" "$TARGET_BASE/commands/$name" command
   done
 fi
 
-# ── 캡처 hook을 settings.json에 머지 (Stop + SessionEnd) ─────
-if [ ! -x "$HOOK_SCRIPT" ]; then
-  err "$HOOK_SCRIPT 실행 권한 없음 — chmod +x 후 재실행"
-  exit 1
-fi
+# ── 캡처·동기화 hook을 settings.json에 머지 ─────────────────
+for f in "$HOOK_SCRIPT" "$SYNC_SCRIPT"; do
+  [ -f "$f" ] || { err "$f 없음"; exit 1; }
+done
 
-node - "$SETTINGS_FILE" "$HOOK_SCRIPT" "${HOOK_EVENTS[*]}" "${RETIRED_HOOKS[*]}" <<'NODE'
+node - "$SETTINGS_FILE" "${RETIRED_HOOKS[*]}" "${HOOK_SPECS[@]}" <<'NODE'
 const fs = require('fs')
 const path = require('path')
-const [, , settingsPath, hookCommand, eventsArg, retiredArg] = process.argv
+const [, , settingsPath, retiredArg, ...specs] = process.argv
 
 let cfg = {}
 if (fs.existsSync(settingsPath)) {
@@ -169,15 +175,18 @@ for (const [event, groups] of Object.entries(cfg.hooks)) {
   }
 }
 
-for (const event of eventsArg.split(' ').filter(Boolean)) {
-  cfg.hooks[event] ??= []
-  if (cfg.hooks[event].some(g => usesCommand(g, c => c.includes(hookCommand)))) {
-    console.log(`[install] 이미 등록됨 — skip: ${event} ${path.basename(hookCommand)}`)
-    continue
+for (const spec of specs) {
+  const [runner, script, eventsArg] = spec.split('|')
+  for (const event of eventsArg.split(',').filter(Boolean)) {
+    cfg.hooks[event] ??= []
+    if (cfg.hooks[event].some(g => usesCommand(g, c => c.includes(script)))) {
+      console.log(`[install] 이미 등록됨 — skip: ${event} ${path.basename(script)}`)
+      continue
+    }
+    cfg.hooks[event].push({ hooks: [{ type: 'command', command: `${runner} "${script}"` }] })
+    changed = true
+    console.log(`[install] 추가됨: ${event} ${path.basename(script)}`)
   }
-  cfg.hooks[event].push({ hooks: [{ type: 'command', command: 'bash "' + hookCommand + '"' }] })
-  changed = true
-  console.log(`[install] 추가됨: ${event} ${path.basename(hookCommand)}`)
 }
 
 if (changed) {
@@ -185,7 +194,7 @@ if (changed) {
   fs.writeFileSync(settingsPath, JSON.stringify(cfg, null, 2) + '\n', 'utf-8')
 }
 NODE
-ok "캡처 hook 등록 검사: $(basename "$HOOK_SCRIPT") (${HOOK_EVENTS[*]})"
+ok "hook 등록 검사: $(basename "$HOOK_SCRIPT"), $(basename "$SYNC_SCRIPT")"
 
 # ── 마무리 ──────────────────────────────────────────────────
 echo ""

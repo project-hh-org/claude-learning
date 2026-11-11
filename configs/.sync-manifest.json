@@ -1,0 +1,15 @@
+[
+  "rules/content-style.md",
+  "agents/architect.md",
+  "agents/backend.md",
+  "agents/frontend.md",
+  "agents/debugger.md",
+  "agents/test.md",
+  "agents/reviewer.md",
+  "commands/ship.md",
+  "hooks/format-on-edit.sh",
+  "hooks/lab-sync-pr.sh",
+  "skills/code-standards",
+  "skills/repo-setup",
+  "skills/admin-guide"
+]

@@ -1,0 +1,8 @@
+{
+  "_comment": "레포 밖(~/.claude)에 원본이 있는 Claude 설정 중 블로그 Configs 탭에 공개할 것만 적는다. scripts/sync-claude-configs.mjs가 Stop hook에서 configs/로 복사한다(원본은 그대로). 공개 검사(scripts/public-scan.sh)에 걸리면 복사하지 않는다. 목록에서 빼면 configs/의 복사본도 지워진다.",
+  "rules": ["content-style"],
+  "agents": ["architect", "backend", "frontend", "debugger", "test", "reviewer"],
+  "commands": ["ship"],
+  "skills": ["code-standards", "repo-setup", "admin-guide"],
+  "hooks": ["format-on-edit", "lab-sync-pr"]
+}

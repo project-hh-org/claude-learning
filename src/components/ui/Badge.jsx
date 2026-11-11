@@ -61,6 +61,7 @@ const CATEGORY_META = {
   hooks:    { variant: 'green',  emoji: '🪝', label: 'Hook' },
   commands: { variant: 'blue',   emoji: '⚡', label: 'Command' },
   skills:   { variant: 'blue',   emoji: '🧩', label: 'Skill' },
+  agents:   { variant: 'muted',  emoji: '🤖', label: 'Agent' },
 }
 
 export function CategoryBadge({ category }) {

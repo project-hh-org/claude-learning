@@ -16,34 +16,59 @@ export const CATEGORY_META = {
   hooks:    { label: 'Hook',    emoji: '🪝', color: 'green'  },
   commands: { label: 'Command', emoji: '⚡', color: 'blue'   },
   skills:   { label: 'Skill',   emoji: '🧩', color: 'blue'   },
+  agents:   { label: 'Agent',   emoji: '🤖', color: 'muted'  },
+}
+
+const metaFor = category => CATEGORY_META[category] || { label: category, emoji: '📄', color: 'muted' }
+
+/**
+ * 카테고리별 파일 구조:
+ *   rules/<file>.md · commands/<file>.md · agents/<file>.md  ← 평탄
+ *   hooks/<file>.sh (또는 .md)                               ← 평탄, 스크립트는 코드 블록으로 표시
+ *   skills/<name>/SKILL.md                                   ← 중첩 (skill 번들)
+ *
+ * Claude Code의 공식 발견 경로(~/.claude/<category>/...)와 같은 구조를 따른다.
+ */
+function listEntries(category) {
+  const dir = path.join(CONFIGS_DIR, category)
+  if (!fs.existsSync(dir)) return []
+  if (category === 'skills') {
+    return fs.readdirSync(dir)
+      .filter(name => fs.statSync(path.join(dir, name)).isDirectory() && fs.existsSync(path.join(dir, name, 'SKILL.md')))
+      .map(name => ({ slug: name, filePath: path.join(dir, name, 'SKILL.md') }))
+  }
+  return fs.readdirSync(dir)
+    .filter(f => f.endsWith('.md') || (category === 'hooks' && f.endsWith('.sh')))
+    .map(file => ({ slug: file.replace(/\.(md|sh)$/, ''), filePath: path.join(dir, file) }))
+}
+
+function listCategories() {
+  if (!fs.existsSync(CONFIGS_DIR)) return []
+  return fs.readdirSync(CONFIGS_DIR).filter(f => fs.statSync(path.join(CONFIGS_DIR, f)).isDirectory())
 }
 
 /**
- * skills/는 다른 카테고리와 구조가 다르다:
- *   rules/<file>.md          ← 평탄
- *   hooks/<file>.md          ← 평탄
- *   commands/<file>.md       ← 평탄
- *   skills/<name>/SKILL.md   ← 중첩 (skill 번들)
- *
- * Claude Code의 공식 Skill 발견 경로(~/.claude/skills/<name>/SKILL.md)와
- * 동일한 구조를 따른다.
+ * 파일 → { data, content }. 셸 스크립트는 frontmatter가 없으므로
+ * 상단 주석 블록의 첫 설명 문단을 description으로 쓰고 본문은 bash 코드 블록으로 감싼다.
  */
-function listSkillEntries(skillsDir) {
-  if (!fs.existsSync(skillsDir)) return []
-  return fs.readdirSync(skillsDir)
-    .filter(name => {
-      const sub = path.join(skillsDir, name)
-      return fs.statSync(sub).isDirectory() && fs.existsSync(path.join(sub, 'SKILL.md'))
-    })
-    .map(name => ({
-      slug:     name,
-      filePath: path.join(skillsDir, name, 'SKILL.md'),
-    }))
+function readConfig(filePath, slug) {
+  const raw = fs.readFileSync(filePath, 'utf-8')
+  if (!filePath.endsWith('.sh')) return matter(raw)
+
+  const desc = []
+  for (const line of raw.split('\n').slice(1)) {
+    if (!line.startsWith('#')) break
+    const text = line.replace(/^#\s?/, '').trim()
+    if (/^=+$/.test(text) || text === `${slug}.sh`) continue
+    if (!text) { if (desc.length) break; continue }
+    desc.push(text)
+  }
+  return { data: { title: `${slug}.sh`, description: desc.join(' ') }, content: '```bash\n' + raw + '\n```\n' }
 }
 
-function installPathFor(category, slug) {
+function installPathFor(category, slug, filePath) {
   if (category === 'skills') return `~/.claude/skills/${slug}/SKILL.md`
-  return `~/.claude/${category}/${slug}.md`
+  return `~/.claude/${category}/${path.basename(filePath)}`
 }
 
 async function markdownToHtml(content) {
@@ -60,52 +85,28 @@ async function markdownToHtml(content) {
 
 /** 전체 config 목록 (카테고리별) */
 export function getAllConfigs() {
-  if (!fs.existsSync(CONFIGS_DIR)) return []
-
-  const configs = []
-  const categories = fs.readdirSync(CONFIGS_DIR)
-    .filter(f => fs.statSync(path.join(CONFIGS_DIR, f)).isDirectory())
-
-  for (const category of categories) {
-    const categoryDir = path.join(CONFIGS_DIR, category)
-
-    const entries = category === 'skills'
-      ? listSkillEntries(categoryDir)
-      : fs.readdirSync(categoryDir)
-          .filter(f => f.endsWith('.md'))
-          .map(file => ({
-            slug:     file.replace(/\.md$/, ''),
-            filePath: path.join(categoryDir, file),
-          }))
-
-    for (const { slug, filePath } of entries) {
-      const raw = fs.readFileSync(filePath, 'utf-8')
-      const { data } = matter(raw)
-      configs.push({
+  return listCategories().flatMap(category =>
+    listEntries(category).map(({ slug, filePath }) => {
+      const { data } = readConfig(filePath, slug)
+      return {
         slug,
         category,
         title:       data.title       || data.name || slug,
         description: data.description || '',
         tags:        data.tags        || [],
-        installPath: installPathFor(category, slug),
-        ...(CATEGORY_META[category] || { label: category, emoji: '📄', color: 'muted' }),
-      })
-    }
-  }
-
-  return configs
+        installPath: installPathFor(category, slug, filePath),
+        ...metaFor(category),
+      }
+    })
+  )
 }
 
 /** 특정 config 상세 조회 + HTML 변환 */
 export async function getConfigBySlug(category, slug) {
-  const filePath = category === 'skills'
-    ? path.join(CONFIGS_DIR, category, slug, 'SKILL.md')
-    : path.join(CONFIGS_DIR, category, `${slug}.md`)
+  const entry = listEntries(category).find(e => e.slug === slug)
+  if (!entry) return null
 
-  if (!fs.existsSync(filePath)) return null
-
-  const raw = fs.readFileSync(filePath, 'utf-8')
-  const { data, content } = matter(raw)
+  const { data, content } = readConfig(entry.filePath, slug)
   const contentHtml = await markdownToHtml(content)
 
   return {
@@ -114,31 +115,15 @@ export async function getConfigBySlug(category, slug) {
     title:       data.title       || data.name || slug,
     description: data.description || '',
     tags:        data.tags        || [],
-    installPath: installPathFor(category, slug),
+    installPath: installPathFor(category, slug, entry.filePath),
     contentHtml,
-    ...(CATEGORY_META[category] || { label: category, emoji: '📄', color: 'muted' }),
+    ...metaFor(category),
   }
 }
 
 /** generateStaticParams용 */
 export function getAllConfigSlugs() {
-  if (!fs.existsSync(CONFIGS_DIR)) return []
-
-  const slugs = []
-  const categories = fs.readdirSync(CONFIGS_DIR)
-    .filter(f => fs.statSync(path.join(CONFIGS_DIR, f)).isDirectory())
-
-  for (const category of categories) {
-    const categoryDir = path.join(CONFIGS_DIR, category)
-    const entries = category === 'skills'
-      ? listSkillEntries(categoryDir).map(e => e.slug)
-      : fs.readdirSync(categoryDir)
-          .filter(f => f.endsWith('.md'))
-          .map(f => f.replace(/\.md$/, ''))
-    for (const slug of entries) {
-      slugs.push({ category, slug })
-    }
-  }
-
-  return slugs
+  return listCategories().flatMap(category =>
+    listEntries(category).map(({ slug }) => ({ category, slug }))
+  )
 }

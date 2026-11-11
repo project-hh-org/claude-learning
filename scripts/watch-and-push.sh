@@ -1,9 +1,10 @@
 #!/bin/bash
 # =============================================================
-# Claude Learning Log — 노트 폴더 자동 push 워처
+# Claude Learning Log — 노트·설정 폴더 자동 push 워처
 #
-# 감시·커밋 범위: NOTE_DIRS(entries/ concepts/ ideas/ seeds/)만.
+# 감시·커밋 범위: NOTE_DIRS(entries/ concepts/ ideas/ seeds/ configs/)만.
 # src/ 등 코드 변경은 건드리지 않는다 — 작업 중인 코드가 섞여 배포되는 것 방지.
+# 커밋 전 scripts/public-scan.sh로 추가된 줄을 검사하고, 걸리면 커밋하지 않는다.
 #
 # 사전 준비:  brew install fswatch
 # 실행:       bash scripts/watch-and-push.sh
@@ -16,10 +17,10 @@
 REPO_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 DEBOUNCE_SECS=4          # 마지막 이벤트 후 N초 기다렸다가 커밋
 BRANCH="main"
-NOTE_DIRS=(entries concepts ideas seeds)
+NOTE_DIRS=(entries concepts ideas seeds configs)
 
 echo "👀 감시 시작: ${NOTE_DIRS[*]} ($REPO_DIR)"
-echo "📌 노트 폴더에 변경사항이 있을 때만 자동 commit + push"
+echo "📌 노트·설정 폴더에 변경사항이 있을 때만 자동 commit + push"
 echo "   종료: Ctrl+C"
 echo ""
 
@@ -47,7 +48,7 @@ LOCK_DIR="$REPO_DIR/.git/learn-watcher.lock"
 rmdir "$LOCK_DIR" 2>/dev/null
 
 fswatch -0 --event Created --event Updated --event Renamed --event Removed \
-  --exclude='/_unsorted/' \
+  --exclude='/_unsorted/' --exclude='/\.sync-tmp-' \
   "${WATCH_PATHS[@]}" | \
 while IFS= read -r -d "" event; do
   date +%s > "$LAST_EVENT_FILE"
@@ -80,6 +81,14 @@ while IFS= read -r -d "" event; do
     echo "$CHANGED"
 
     git add -A -- "${NOTE_PATHS[@]}"
+
+    # 공개 레포 안전 검사: 추가된 줄에 자격증명·홈 경로·차단어가 있으면 커밋하지 않는다
+    if ! SCAN_OUT=$(bash "$REPO_DIR/scripts/public-scan.sh" --staged "${NOTE_PATHS[@]}"); then
+      git reset -q -- "${NOTE_PATHS[@]}"
+      echo "🛑 공개 검사에 걸려 커밋 보류 — 해당 줄을 고치면 다음 저장 때 다시 시도:"
+      echo "$SCAN_OUT"
+      exit 1
+    fi
 
     # 변경 파일 목록으로 커밋 메시지 생성
     FILES=$(git diff --cached --name-only -- "${NOTE_PATHS[@]}" | tr '\n' ', ' | sed 's/,$//')

@@ -1,6 +1,6 @@
 'use client'
 
-const CATEGORY_ORDER = ['rules', 'hooks', 'commands', 'skills']
+const CATEGORY_ORDER = ['rules', 'hooks', 'commands', 'skills', 'agents']
 
 /**
  * ConfigsSidebar — Configs 인덱스(/configs) 페이지의 사이드바.

@@ -8,7 +8,7 @@ import SearchInput from '../ui/SearchInput'
 import { CategoryBadge } from '../ui/Badge'
 import ConfigsSidebar from '../sidebar/ConfigsSidebar'
 
-const CATEGORY_ORDER = ['rules', 'hooks', 'commands', 'skills']
+const CATEGORY_ORDER = ['rules', 'hooks', 'commands', 'skills', 'agents']
 
 export default function ConfigsList({ configs }) {
   const router = useRouter()
