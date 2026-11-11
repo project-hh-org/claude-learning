@@ -150,8 +150,8 @@ run_extract() {
 # (처리 위치는 batch를 만들 때 이미 넘어가므로, 남은 batch가 유일한 재시도 수단)
 find "$STATE_DIR/batches" -type f -mtime +3 -delete 2>/dev/null
 # 재시도 담당을 나눈다: hook은 Claude Code batch만, 30분 작업은 aside-* batch만 (같은 batch 동시 추출 방지)
-if [ "$SWEEP" = 1 ]; then RETRY_GLOB='aside-*.txt'; else RETRY_GLOB='[!a]*.txt'; fi
-find "$STATE_DIR/batches" -name "$RETRY_GLOB" -mmin +10 2>/dev/null | while IFS= read -r OLD; do
+if [ "$SWEEP" = 1 ]; then RETRY_FILTER=(-name 'aside-*.txt'); else RETRY_FILTER=(-name '*.txt' ! -name 'aside-*'); fi
+find "$STATE_DIR/batches" "${RETRY_FILTER[@]}" -mmin +10 2>/dev/null | while IFS= read -r OLD; do
   touch "$OLD"   # 재시도 중에 다음 hook이 또 띄우지 않도록
   log "batch 재시도: $(basename "$OLD")"
   run_extract "$OLD"
