@@ -39,6 +39,7 @@ STATE_DIR="${LEARNING_CAPTURE_STATE:-$HOME/.claude/learning-capture}"
 LOG="$STATE_DIR/capture.log"
 MIN_USER_TURNS=3
 MODEL="haiku"
+EXTRACT_TIMEOUT="${EXTRACT_TIMEOUT:-300}"   # claude -p 호출 하나의 상한(초)
 mkdir -p "$STATE_DIR/batches"
 
 VAULT="${LEARNING_VAULT:-$(head -n1 "$HOME/.claude/learning-vault.path" 2>/dev/null | tr -d '\r\n')}"
@@ -68,11 +69,20 @@ if [ "${1:-}" = "--extract" ]; then
   WORK="$STATE_DIR/work"
   mkdir -p "$WORK"
   OUT="$BATCH.out.json"
-  if ! (cd "$WORK" && CLAUDE_LEARNING_CAPTURE=1 claude -p \
-        --model "$MODEL" --tools "" --no-session-persistence --setting-sources "" \
-        --system-prompt "$PROMPT" --output-format json --json-schema "$SCHEMA" \
-        < "$BATCH" > "$OUT" 2>> "$LOG"); then
-    log "claude -p 실패 — batch 보존: $BATCH"
+  touch "$BATCH"   # 처리 중 표시 — 재시도 루프(10분 기준)가 같은 batch를 또 띄우지 않게
+
+  # 호출 하나가 멈춰도 30분 작업 전체가 막히지 않도록 시간 상한 (macOS엔 timeout 명령이 없어 직접 구현)
+  (cd "$WORK" && CLAUDE_LEARNING_CAPTURE=1 exec claude -p \
+      --model "$MODEL" --tools "" --no-session-persistence --setting-sources "" \
+      --system-prompt "$PROMPT" --output-format json --json-schema "$SCHEMA" \
+      < "$BATCH" > "$OUT" 2>> "$LOG") &
+  CLAUDE_PID=$!
+  ( sleep "$EXTRACT_TIMEOUT" && kill "$CLAUDE_PID" 2>/dev/null ) &
+  KILLER_PID=$!
+  wait "$CLAUDE_PID"; RC=$?
+  kill "$KILLER_PID" 2>/dev/null; wait "$KILLER_PID" 2>/dev/null
+  if [ "$RC" -ne 0 ]; then
+    log "claude -p 실패(rc=$RC, ${EXTRACT_TIMEOUT}초 상한) — batch 보존: $(basename "$BATCH")"
     exit 0
   fi
 
@@ -139,7 +149,9 @@ run_extract() {
 # ── 실패로 남은 batch: 10분 지난 것은 재시도, 3일 지난 것은 정리 ──
 # (처리 위치는 batch를 만들 때 이미 넘어가므로, 남은 batch가 유일한 재시도 수단)
 find "$STATE_DIR/batches" -type f -mtime +3 -delete 2>/dev/null
-find "$STATE_DIR/batches" -name '*.txt' -mmin +10 2>/dev/null | while IFS= read -r OLD; do
+# 재시도 담당을 나눈다: hook은 Claude Code batch만, 30분 작업은 aside-* batch만 (같은 batch 동시 추출 방지)
+if [ "$SWEEP" = 1 ]; then RETRY_GLOB='aside-*.txt'; else RETRY_GLOB='[!a]*.txt'; fi
+find "$STATE_DIR/batches" -name "$RETRY_GLOB" -mmin +10 2>/dev/null | while IFS= read -r OLD; do
   touch "$OLD"   # 재시도 중에 다음 hook이 또 띄우지 않도록
   log "batch 재시도: $(basename "$OLD")"
   run_extract "$OLD"
@@ -171,6 +183,11 @@ for (const dir of fs.readdirSync(sessionsDir)) {
 
   // 첫 실행: 지금 크기를 기준점으로만 기록 (과거 대화는 처리하지 않음)
   if (isBaseline) { fs.writeFileSync(stateFile, JSON.stringify({ offset: st.size })); continue }
+  // 파일이 처리 위치보다 작아졌다면 다시 쓰인 것 — 처음부터 다시 본다 (조용히 건너뛰지 않게)
+  if (st.size < offset) {
+    console.error(`[aside] ${dir}: 파일이 처리 위치보다 작아짐(${st.size} < ${offset}) — 처음부터 다시 처리`)
+    offset = 0
+  }
   if (st.size <= offset) continue
 
   // 새로 붙은 부분만 읽는다. 쓰는 중인 마지막 줄은 다음 번으로 넘긴다
