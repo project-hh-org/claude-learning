@@ -77,7 +77,7 @@ WHAT/WHY/HOW 프레임워크로 작성하고 **200줄 이내** 유지 권장.
 # ~/.claude/CLAUDE.md에 추가
 ## MEMORY
 세션 시작 시 다음 파일을 읽어 컨텍스트를 파악한다:
-- /Users/hwangdahee/Library/Mobile Documents/com~apple~CloudDocs/claude/MEMORY.md
+- ~/Library/Mobile Documents/com~apple~CloudDocs/claude/MEMORY.md
 ```
 
 ---
@@ -103,8 +103,8 @@ cp "iCloud/claude/CLAUDE_GLOBAL.md" ~/.claude/CLAUDE.md
 
 # 2. Hooks 가드레일 적용
 python3 - <<'EOF'
-import json, shutil
-s = "/Users/hwangdahee/.claude/settings.json"
+import json, os, shutil
+s = os.path.expanduser("~/.claude/settings.json")
 h = "iCloud/claude/hooks-guardrails.json"
 shutil.copy(s, s + ".bak")
 with open(s) as f: settings = json.load(f)
