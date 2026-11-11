@@ -4,7 +4,7 @@
 #
 # 이 레포의 configs/{skills,rules,hooks}/* 자산을 Claude Code/
 # Claude Code Desktop app이 자동 발견하는 경로로 심볼릭 링크 등록.
-# 또한 ~/.claude/settings.json의 Stop hook 항목을 안전하게 머지.
+# 또한 ~/.claude/settings.json에 캡처 hook(Stop·SessionEnd)을 안전하게 머지.
 #
 # 단일 소스: configs/ (블로그 표시 + Claude 자동 로드 동시 만족)
 # 편집 시 즉시 반영 — symlink이므로 파일 사본 동기화 불필요.
@@ -44,10 +44,10 @@ esac
 
 SETTINGS_FILE="$TARGET_BASE/settings.json"
 VAULT_PATH_FILE="$TARGET_BASE/learning-vault.path"
-HOOK_SCRIPTS=(
-  "$REPO_ROOT/configs/hooks/idea-safety-net.sh"
-  "$REPO_ROOT/configs/hooks/concept-synthesis.sh"
-)
+HOOK_SCRIPT="$REPO_ROOT/configs/hooks/llm-capture.sh"
+HOOK_EVENTS=(Stop SessionEnd)
+# llm-capture.sh로 대체된 정규식 hook — settings.json에 남아 있으면 제거한다
+RETIRED_HOOKS=(idea-safety-net.sh concept-synthesis.sh)
 
 # ── --uninstall ─────────────────────────────────────────────
 if [ "${1:-}" = "--uninstall" ]; then
@@ -59,7 +59,7 @@ if [ "${1:-}" = "--uninstall" ]; then
   rm -f "$TARGET_BASE/commands/log-entry.md" 2>/dev/null || true
   rm -f "$VAULT_PATH_FILE" 2>/dev/null || true
   ok "심볼릭 링크 제거 완료 ($TARGET_BASE)"
-  warn "settings.json의 Stop hook 항목은 수동으로 제거하세요: $SETTINGS_FILE"
+  warn "settings.json의 Stop/SessionEnd hook 항목은 수동으로 제거하세요: $SETTINGS_FILE"
   exit 0
 fi
 
@@ -132,17 +132,16 @@ if [ -d "$COMMANDS_SRC" ]; then
   done
 fi
 
-# ── Stop hook들을 settings.json에 머지 ───────────────────────
-for HOOK_SCRIPT in "${HOOK_SCRIPTS[@]}"; do
-  if [ ! -x "$HOOK_SCRIPT" ]; then
-    warn "$HOOK_SCRIPT 실행 권한 없음 — skip (chmod +x 후 재실행)"
-    continue
-  fi
+# ── 캡처 hook을 settings.json에 머지 (Stop + SessionEnd) ─────
+if [ ! -x "$HOOK_SCRIPT" ]; then
+  err "$HOOK_SCRIPT 실행 권한 없음 — chmod +x 후 재실행"
+  exit 1
+fi
 
-  node - "$SETTINGS_FILE" "$HOOK_SCRIPT" <<'NODE'
+node - "$SETTINGS_FILE" "$HOOK_SCRIPT" "${HOOK_EVENTS[*]}" "${RETIRED_HOOKS[*]}" <<'NODE'
 const fs = require('fs')
 const path = require('path')
-const [, , settingsPath, hookCommand] = process.argv
+const [, , settingsPath, hookCommand, eventsArg, retiredArg] = process.argv
 
 let cfg = {}
 if (fs.existsSync(settingsPath)) {
@@ -154,29 +153,39 @@ if (fs.existsSync(settingsPath)) {
 }
 
 cfg.hooks ??= {}
-cfg.hooks.Stop ??= []
+const retired = retiredArg.split(' ').filter(Boolean)
+const usesCommand = (group, match) =>
+  Array.isArray(group?.hooks) && group.hooks.some(h => typeof h?.command === 'string' && match(h.command))
+let changed = false
 
-const desired = {
-  matcher: '.*',
-  hooks: [{ type: 'command', command: 'bash "' + hookCommand + '"' }],
+// 대체된 hook 제거 (모든 이벤트에서)
+for (const [event, groups] of Object.entries(cfg.hooks)) {
+  if (!Array.isArray(groups)) continue
+  const kept = groups.filter(g => !usesCommand(g, c => retired.some(r => c.includes(r))))
+  if (kept.length !== groups.length) {
+    cfg.hooks[event] = kept
+    changed = true
+    console.log(`[install] 제거됨: ${event}의 대체된 hook ${groups.length - kept.length}개`)
+  }
 }
 
-const already = (cfg.hooks.Stop || []).some(group =>
-  Array.isArray(group?.hooks) &&
-  group.hooks.some(h => h?.command && h.command.includes(hookCommand))
-)
+for (const event of eventsArg.split(' ').filter(Boolean)) {
+  cfg.hooks[event] ??= []
+  if (cfg.hooks[event].some(g => usesCommand(g, c => c.includes(hookCommand)))) {
+    console.log(`[install] 이미 등록됨 — skip: ${event} ${path.basename(hookCommand)}`)
+    continue
+  }
+  cfg.hooks[event].push({ hooks: [{ type: 'command', command: 'bash "' + hookCommand + '"' }] })
+  changed = true
+  console.log(`[install] 추가됨: ${event} ${path.basename(hookCommand)}`)
+}
 
-if (already) {
-  console.log('[install] 이미 등록됨 — skip: ' + path.basename(hookCommand))
-} else {
-  cfg.hooks.Stop.push(desired)
+if (changed) {
   fs.mkdirSync(path.dirname(settingsPath), { recursive: true })
   fs.writeFileSync(settingsPath, JSON.stringify(cfg, null, 2) + '\n', 'utf-8')
-  console.log('[install] 추가됨: ' + path.basename(hookCommand) + ' → ' + settingsPath)
 }
 NODE
-  ok "Stop hook 등록 검사: $(basename "$HOOK_SCRIPT")"
-done
+ok "캡처 hook 등록 검사: $(basename "$HOOK_SCRIPT") (${HOOK_EVENTS[*]})"
 
 # ── 마무리 ──────────────────────────────────────────────────
 echo ""

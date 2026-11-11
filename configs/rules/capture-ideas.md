@@ -59,4 +59,4 @@ thinking 중 다음 패턴이 나타나는 즉시 `capture-idea` 스킬을 발�
 
 ## 누락 방지 안전망
 
-Stop hook(`configs/hooks/idea-safety-net.sh`)이 턴이 끝날 때마다 JSONL의 thinking·본문 텍스트를 스캔해 캡처되지 않은 ideation 후보를 추출한다. 즉 이 규칙을 위반해 캡처를 빠뜨려도 일부는 사후에 잡힌다 — 그러나 1차 책임은 thinking 시점에 즉시 발동하는 것이다.
+Stop·SessionEnd hook(`configs/hooks/llm-capture.sh`)이 새로 쌓인 대화를 작은 모델(haiku)에 넘겨 캡처되지 않은 발상 후보를 `ideas/_unsorted/`에 떨군다. 즉 이 규칙을 위반해 캡처를 빠뜨려도 일부는 사후에 잡힌다 — 그러나 1차 책임은 thinking 시점에 즉시 발동하는 것이다.

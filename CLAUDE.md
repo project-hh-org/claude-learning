@@ -294,10 +294,11 @@ SCOPE=project bash scripts/install-claude-config.sh   # <repo>/.claude/...에 (p
 | Skill | `configs/skills/capture-concept/SKILL.md` | 학습 시그널 즉시 concepts/에 seedling 저장 |
 | Rule | `configs/rules/capture-ideas.md` | capture-idea 발동 강제 |
 | Rule | `configs/rules/capture-concepts.md` | capture-concept 발동 강제 |
-| Stop hook (안전망) | `configs/hooks/idea-safety-net.sh` | 턴 끝마다 thinking·본문 후처리 → `ideas/_unsorted/` (세션당 파일 1개, gitignore) |
-| Stop hook (합성) | `configs/hooks/concept-synthesis.sh` | 턴 끝마다 정의 Q&A 추출 → `concepts/_unsorted/` (세션당 파일 1개, gitignore) |
+| Stop·SessionEnd hook (안전망) | `configs/hooks/llm-capture.sh` | 새 사용자 메시지 3개 이상 쌓이면(또는 세션 종료 시) 새 부분만 haiku에 넘겨 개념·발상 후보 추출 → `concepts/_unsorted/`·`ideas/_unsorted/` (후보당 파일 1개, gitignore). 로그: `~/.claude/learning-capture/capture.log` |
 
 `_unsorted/` 폴더의 후보는 사용자가 검토 후 정식 위치로 옮기거나 삭제한다.
+
+> 정규식 기반 안전망(`idea-safety-net.sh`, `concept-synthesis.sh`)은 대화 표현에 맞지 않아 후보를 거의 못 잡아 2026-11에 `llm-capture.sh`로 대체했다.
 
 ### 머신별 1회 셋업
 

@@ -25,9 +25,9 @@
 
 ### 무엇을 하는가
 
-이 레포의 `configs/{skills,rules}/`와 `configs/hooks/idea-safety-net.sh`를
+이 레포의 `configs/{skills,rules}/`를
 **Claude Code가 자동 발견하는 표준 경로**(`~/.claude/...`)로 심볼릭 링크
-등록하고, Stop hook 항목을 `~/.claude/settings.json`에 안전하게 머지한다.
+등록하고, `configs/hooks/llm-capture.sh`를 Stop·SessionEnd hook으로 `~/.claude/settings.json`에 안전하게 머지한다.
 
 > `configs/`는 블로그가 읽어 페이지로 렌더링하는 표시용 경로다. Claude Code는 이 경로를 자동 발견하지 않으므로 별도 등록이 필요하다. 심볼릭 링크 방식이라 `configs/`에서 편집한 내용이 즉시 반영된다.
 
@@ -44,7 +44,7 @@ bash scripts/install-claude-config.sh
 - `~/.claude/skills/capture-concept` → 같은 방식
 - `~/.claude/rules/capture-ideas.md`, `capture-concepts.md`, `security.md` → 같은 방식
 - `~/.claude/commands/log-entry.md` → `<repo>/configs/commands/log-entry.md` 심볼릭 링크
-- `~/.claude/settings.json`의 `hooks.Stop`에 `idea-safety-net.sh`, `concept-synthesis.sh` 항목 머지 (기존 보존, 중복 방지)
+- `~/.claude/settings.json`의 `hooks.Stop`·`hooks.SessionEnd`에 `llm-capture.sh` 항목 머지 (기존 보존, 중복 방지, 대체된 `idea-safety-net.sh`·`concept-synthesis.sh` 항목은 제거)
 - **`~/.claude/learning-vault.path`에 이 레포 절대경로 한 줄 기록** — skill/hook이 이를 읽어 cwd 무관하게 항상 같은 vault에 저장
 
 ### 적용 범위 옵션
@@ -60,9 +60,10 @@ bash scripts/install-claude-config.sh
 2. 짧게 대화하면서:
    - 발상이 떠올랐을 때 `ideas/` 또는 `seeds/`에 자동 생성 확인 (`capture-idea` skill)
    - "X가 뭐야?" 같은 학습 질문을 하고 답변 후 `concepts/`에 seedling 자동 생성 확인 (`capture-concept` skill)
-3. 세션 종료 후:
-   - `<repo>/ideas/_unsorted/` — thinking 후처리로 누락된 발상 후보 (`idea-safety-net.sh`)
-   - `<repo>/concepts/_unsorted/` — 정의 Q&A 합성 후보 (`concept-synthesis.sh`)
+3. 사용자 메시지가 3개 이상 쌓이거나 세션이 끝나면 (`llm-capture.sh`, 백그라운드로 haiku 호출):
+   - `<repo>/concepts/_unsorted/<날짜>-<slug>.md` — 놓친 개념 후보
+   - `<repo>/ideas/_unsorted/<날짜>-<slug>.md` — 놓친 발상 후보
+   - 실행 기록: `~/.claude/learning-capture/capture.log`
 4. `_unsorted/` 안의 후보들을 검토 → 가치 있는 것만 정식 폴더(`ideas/`, `seeds/`, `concepts/`)로 이동 + frontmatter 정비. 나머지 삭제.
 
 ### 끄고 싶을 때

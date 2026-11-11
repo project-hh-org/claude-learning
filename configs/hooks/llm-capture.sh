@@ -1,0 +1,189 @@
+#!/bin/bash
+# =============================================================
+# llm-capture.sh
+#
+# Claude Code Stop / SessionEnd hook — 대화에서 새로 배운 개념과
+# 만들어볼 만한 발상을 작은 모델(claude -p, haiku)이 골라
+# concepts/_unsorted/ · ideas/_unsorted/ 에 seedling 후보로 떨군다.
+# 정규식 안전망(idea-safety-net · concept-synthesis)을 대체한다.
+#
+# 동작:
+#   - 세션별로 마지막 처리 위치(transcript 줄 번호)를 기록하고 그 뒤만 본다
+#   - Stop: 새 사용자 메시지가 MIN_USER_TURNS 이상 쌓였을 때만 처리
+#     (Desktop 세션은 며칠씩 이어져 SessionEnd만으로는 거의 안 돈다)
+#   - SessionEnd: 남은 부분을 모두 처리
+#   - 모델 호출은 백그라운드 — hook 자체는 바로 끝난다
+#   - 결과는 gitignore된 _unsorted/에만 쓴다 (공개 전 사람이 검토)
+#
+# 등록 (~/.claude/settings.json — install-claude-config.sh가 머지):
+#   "Stop":       [{ "hooks": [{ "type": "command", "command": "bash \"<repo>/configs/hooks/llm-capture.sh\"" }] }]
+#   "SessionEnd": [{ "hooks": [{ "type": "command", "command": "bash \"<repo>/configs/hooks/llm-capture.sh\"" }] }]
+#
+# 로그: ~/.claude/learning-capture/capture.log
+# 테스트용 vault·상태 폴더 지정: LEARNING_VAULT=<dir> LEARNING_CAPTURE_STATE=<dir>
+# =============================================================
+
+set -uo pipefail
+
+# 이 hook이 띄운 claude -p 세션이 다시 hook을 부르는 재귀 방지
+[ -n "${CLAUDE_LEARNING_CAPTURE:-}" ] && exit 0
+
+STATE_DIR="${LEARNING_CAPTURE_STATE:-$HOME/.claude/learning-capture}"
+LOG="$STATE_DIR/capture.log"
+MIN_USER_TURNS=3
+MODEL="haiku"
+mkdir -p "$STATE_DIR/batches"
+
+VAULT="${LEARNING_VAULT:-$(head -n1 "$HOME/.claude/learning-vault.path" 2>/dev/null | tr -d '\r\n')}"
+[ -d "$VAULT/concepts" ] && [ -d "$VAULT/ideas" ] || exit 0
+
+log() { echo "[$(date '+%Y-%m-%d %H:%M:%S')] $*" >> "$LOG"; }
+
+# ── 2단계 (백그라운드): 모델 호출 → 후보 파일 쓰기 ────────────
+if [ "${1:-}" = "--extract" ]; then
+  BATCH="$2"
+  [ -f "$BATCH" ] || exit 0
+
+  SCHEMA='{"type":"object","properties":{"items":{"type":"array","maxItems":5,"items":{"type":"object","properties":{"kind":{"type":"string","enum":["concept","idea"]},"slug":{"type":"string"},"title":{"type":"string"},"summary":{"type":"string"},"tags":{"type":"array","items":{"type":"string"},"maxItems":3},"body":{"type":"string"}},"required":["kind","slug","title","summary","tags","body"]}}},"required":["items"]}'
+
+  PROMPT='너는 개발 학습 로그의 캡처 필터다. 입력은 Claude Code 대화의 일부다.
+사용자가 이 대화에서 새로 알게 된 재사용 가능한 개념·원리·패턴(kind=concept)과,
+대화 중 나온 만들어볼 만한 발상(kind=idea)만 골라 items로 반환하라.
+
+- 이 대화의 작업 기록, 진행 상황, 특정 버그 수정 자체는 제외한다. 그 뒤에 있는 일반 원리만 concept이 된다.
+- 한 줄짜리 사실, 흔한 상식, 명령어 인자 같은 것은 제외한다.
+- 확실하지 않으면 넣지 마라. 해당 없으면 빈 배열. 최대 5개.
+- 공개 저장소에 올라갈 수 있다. 회사명·서비스명·내부 도메인·계정 ID·경로 속 사용자명·자격증명은 일반화한다(예: your-app).
+- slug: 영문 소문자 kebab-case, 날짜 없음.
+- title, summary(한두 문장), body는 한국어. 대화에 나온 사실만 쓰고 지어내지 마라.
+- body 형식: concept은 "## 한 줄 정의", "## 핵심", 필요하면 "## 예시". idea는 "## 발상", 필요하면 "## 적용 위치".'
+
+  WORK="$STATE_DIR/work"
+  mkdir -p "$WORK"
+  OUT="$BATCH.out.json"
+  if ! (cd "$WORK" && CLAUDE_LEARNING_CAPTURE=1 claude -p \
+        --model "$MODEL" --tools "" --no-session-persistence --setting-sources "" \
+        --system-prompt "$PROMPT" --output-format json --json-schema "$SCHEMA" \
+        < "$BATCH" > "$OUT" 2>> "$LOG"); then
+    log "claude -p 실패 — batch 보존: $BATCH"
+    exit 0
+  fi
+
+  node - "$OUT" "$VAULT" "$(basename "$BATCH" .txt)" <<'NODE' >> "$LOG" 2>&1
+const fs = require('fs')
+const path = require('path')
+const [, , outPath, vault, batchName] = process.argv
+
+const res = JSON.parse(fs.readFileSync(outPath, 'utf-8'))
+if (res.is_error) { console.log(`[${batchName}] 모델 오류: ${res.subtype}`); process.exit(1) }
+const items = res.structured_output?.items || []
+const today = new Date().toISOString().slice(0, 10)
+const yq = s => JSON.stringify(String(s ?? ''))
+
+// 이미 있는 슬러그(정식·_unsorted)는 건너뛴다
+const known = new Set()
+for (const dir of ['concepts', 'concepts/_unsorted', 'ideas', 'ideas/_unsorted']) {
+  const abs = path.join(vault, dir)
+  if (!fs.existsSync(abs)) continue
+  for (const f of fs.readdirSync(abs)) {
+    if (f.endsWith('.md')) known.add(f.replace(/\.md$/, '').replace(/^\d{4}-\d{2}-\d{2}-/, ''))
+  }
+}
+
+const written = []
+for (const it of items) {
+  const slug = String(it.slug || '').toLowerCase().replace(/[^a-z0-9-]/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '')
+  if (!slug || known.has(slug)) continue
+  const tags = `[${(it.tags || []).map(yq).join(', ')}]`
+  const front = it.kind === 'concept'
+    ? ['type: "concept"', 'stage: "seedling"', `summary: ${yq(it.summary)}`, 'publish: false',
+       `tags: ${tags}`, 'related: []', `created: "${today}"`, `updated: "${today}"`]
+    : [`date: "${today}"`, 'kind: "spark"', 'scope: "current-project"', 'stage: "seedling"',
+       `summary: ${yq(it.summary)}`, `tags: ${tags}`]
+  const md = ['---', `title: ${yq(it.title)}`, ...front,
+    'source: "llm-capture"', `capture_batch: ${yq(batchName)}`, '---', '', String(it.body || '').trim(), ''].join('\n')
+  const dir = path.join(vault, it.kind === 'concept' ? 'concepts/_unsorted' : 'ideas/_unsorted')
+  fs.mkdirSync(dir, { recursive: true })
+  const file = path.join(dir, `${today}-${slug}.md`)
+  fs.writeFileSync(file, md, 'utf-8')
+  known.add(slug)
+  written.push(path.relative(vault, file))
+}
+console.log(`[${batchName}] 후보 ${items.length}개 중 ${written.length}개 저장 (cost $${res.total_cost_usd ?? '?'})` +
+  (written.length ? '\n  ' + written.join('\n  ') : ''))
+NODE
+  [ "${PIPESTATUS[0]:-0}" -eq 0 ] && rm -f "$BATCH" "$OUT"
+  exit 0
+fi
+
+# ── 실패로 남은 batch: 10분 지난 것은 재시도, 3일 지난 것은 정리 ──
+# (처리 위치는 batch를 만들 때 이미 넘어가므로, 남은 batch가 유일한 재시도 수단)
+find "$STATE_DIR/batches" -type f -mtime +3 -delete 2>/dev/null
+find "$STATE_DIR/batches" -name '*.txt' -mmin +10 2>/dev/null | while IFS= read -r OLD; do
+  touch "$OLD"   # 재시도 중에 다음 hook이 또 띄우지 않도록
+  log "batch 재시도: $(basename "$OLD")"
+  nohup bash "$0" --extract "$OLD" >/dev/null 2>&1 &
+done
+
+# ── 1단계 (hook 본체): 새 대화 부분을 batch 파일로 잘라낸다 ──────
+EVENT_JSON="$(cat)"
+# stdin은 heredoc(스크립트)이 쓰므로 이벤트는 환경 변수로 넘긴다
+BATCH="$(HOOK_EVENT="$EVENT_JSON" node - "$STATE_DIR" "$MIN_USER_TURNS" <<'NODE'
+const fs = require('fs')
+const path = require('path')
+const [, , stateDir, minTurnsArg] = process.argv
+
+let e = {}
+try { e = JSON.parse(process.env.HOOK_EVENT || '') } catch { process.exit(0) }
+const { session_id: sid, transcript_path: tp, hook_event_name: ev } = e
+if (!sid || !tp || !fs.existsSync(tp)) process.exit(0)
+
+const stateFile = path.join(stateDir, `${sid}.json`)
+let start = 0
+try { start = JSON.parse(fs.readFileSync(stateFile, 'utf-8')).line || 0 } catch {}
+
+const lines = fs.readFileSync(tp, 'utf-8').split('\n').filter(Boolean)
+if (lines.length <= start) process.exit(0)
+
+// 사용자 메시지에서 하네스가 붙인 블록은 걷어낸다 (사용자가 쓴 말만 남김)
+const HARNESS = /<(system-reminder|task-notification|bash-stdout|bash-stderr|local-command-stdout|command-message|command-args)>[\s\S]*?<\/\1>/g
+const turns = []
+let userTurns = 0
+for (const line of lines.slice(start)) {
+  let evt
+  try { evt = JSON.parse(line) } catch { continue }
+  const msg = evt?.message
+  if (!msg || evt.isMeta) continue
+  const blocks = typeof msg.content === 'string' ? [{ type: 'text', text: msg.content }] : (msg.content || [])
+  const text = blocks.filter(b => b.type === 'text').map(b => b.text).join('\n')
+  if (msg.role === 'user') {
+    const clean = text.replace(HARNESS, '').replace(/<\/?bash-input>/g, '').trim()
+    // transcript에 같은 메시지가 두 번 기록되는 경우가 있어 연속 중복은 건너뛴다
+    if (!clean || turns.at(-1) === `### 사용자\n${clean}`) continue
+    userTurns++
+    turns.push(`### 사용자\n${clean}`)
+  } else if (msg.role === 'assistant' && text.trim() && turns.at(-1) !== `### Claude\n${text.trim()}`) {
+    turns.push(`### Claude\n${text.trim()}`)
+  }
+}
+
+// Stop은 충분히 쌓였을 때만. 처리 위치를 안 옮기므로 다음 Stop에서 이어서 센다
+if (ev === 'Stop' && userTurns < Number(minTurnsArg)) process.exit(0)
+
+fs.writeFileSync(stateFile, JSON.stringify({ line: lines.length, updated: new Date().toISOString() }))
+if (userTurns === 0) process.exit(0)
+
+const MAX = 80000  // 너무 길면 뒤쪽(최근)만
+let body = turns.join('\n\n')
+if (body.length > MAX) body = body.slice(-MAX)
+// 끝 줄까지 이름에 넣어, 거의 동시에 온 Stop·SessionEnd가 같은 파일을 덮어쓰지 않게 한다
+const batch = path.join(stateDir, 'batches', `${sid.slice(0, 8)}-${start}-${lines.length}.txt`)
+fs.writeFileSync(batch, body, 'utf-8')
+console.log(batch)
+NODE
+)" || exit 0
+
+[ -z "$BATCH" ] && exit 0
+log "batch 생성: $(basename "$BATCH") ($(wc -c < "$BATCH" | tr -d ' ')B)"
+nohup bash "$0" --extract "$BATCH" >/dev/null 2>&1 &
+exit 0
