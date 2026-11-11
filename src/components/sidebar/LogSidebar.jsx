@@ -11,7 +11,8 @@
  *     onTagClick={tag => setActiveTag(tag)}
  *   />
  */
-export default function LogSidebar({ posts, tags = [], thisMonth, onTagClick }) {
+// cloudTags: 태그 클라우드에 보일 태그 (생략하면 tags 전체). 통계의 태그 수는 항상 tags 기준
+export default function LogSidebar({ posts, tags = [], cloudTags = tags, thisMonth, onTagClick }) {
   return (
     <>
       <div className="s-card">
@@ -24,7 +25,7 @@ export default function LogSidebar({ posts, tags = [], thisMonth, onTagClick }) 
       <div className="s-card">
         <h3>🏷️ 태그</h3>
         <div className="tag-cloud">
-          {tags.map(tag => (
+          {cloudTags.map(tag => (
             <button key={tag} className="cloud-tag" onClick={() => onTagClick?.(tag)}>
               {tag}
             </button>

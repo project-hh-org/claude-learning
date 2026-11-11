@@ -9,16 +9,34 @@ import TagFilter from '../ui/TagFilter'
 import LogSidebar from '../sidebar/LogSidebar'
 import { ConceptBadge } from '../ui/Badge'
 
+const TOP_TAG_COUNT = 15
+const TOGGLE = '__toggle-tags'
+
 export default function PostList({ posts }) {
   const router = useRouter()
   const [query, setQuery] = useState('')
   const [activeTag, setActiveTag] = useState('all')
+  const [showAllTags, setShowAllTags] = useState(false)
 
   const allTags = useMemo(() => {
     const set = new Set()
     posts.forEach(p => p.tags?.forEach(t => set.add(t)))
     return Array.from(set).sort()
   }, [posts])
+
+  // 태그가 100개를 넘어 필터가 첫 화면을 덮으므로, 기본은 많이 쓰인 태그만 보여준다
+  const topTags = useMemo(() => {
+    const count = {}
+    posts.forEach(p => p.tags?.forEach(t => { count[t] = (count[t] || 0) + 1 }))
+    return Object.keys(count)
+      .sort((a, b) => count[b] - count[a] || a.localeCompare(b))
+      .slice(0, TOP_TAG_COUNT)
+  }, [posts])
+
+  const visibleTags = showAllTags
+    ? allTags
+    : (activeTag === 'all' || topTags.includes(activeTag) ? topTags : [...topTags, activeTag])
+  const hiddenCount = allTags.length - topTags.length
 
   const filtered = useMemo(() => {
     const q = query.toLowerCase()
@@ -54,7 +72,7 @@ export default function PostList({ posts }) {
         { label: '총', value: posts.length, suffix: '개' },
         { label: '태그', value: allTags.length, suffix: '개' },
       ]}
-      sidebar={<LogSidebar posts={posts} tags={allTags} thisMonth={thisMonth} onTagClick={setActiveTag} />}
+      sidebar={<LogSidebar posts={posts} tags={allTags} cloudTags={topTags} thisMonth={thisMonth} onTagClick={setActiveTag} />}
     >
       <div className="controls">
         <SearchInput
@@ -66,10 +84,13 @@ export default function PostList({ posts }) {
           label="태그"
           options={[
             { value: 'all', label: '전체' },
-            ...allTags.map(t => ({ value: t, label: t })),
+            ...visibleTags.map(t => ({ value: t, label: t })),
+            ...(hiddenCount > 0
+              ? [{ value: TOGGLE, label: showAllTags ? '접기' : `+${hiddenCount} 더보기` }]
+              : []),
           ]}
           active={activeTag}
-          onSelect={setActiveTag}
+          onSelect={v => (v === TOGGLE ? setShowAllTags(s => !s) : setActiveTag(v))}
         />
       </div>
 
