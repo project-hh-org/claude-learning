@@ -1,30 +1,22 @@
 'use client'
 
-import DetailLayout from '../layout/DetailLayout'
+import NoteDetail from './NoteDetail'
 import { CategoryBadge } from '../ui/Badge'
-import DetailMeta from '../ui/DetailMeta'
-import DetailTitle from '../ui/DetailTitle'
-import DetailSummary from '../ui/DetailSummary'
-import DetailTags from '../ui/DetailTags'
-import DetailBody from '../ui/DetailBody'
 
+/** Claude Configs — 배지: 카테고리 / 메타: 설치 경로 */
 export default function ConfigDetail({ config }) {
-  const installPath = config.installPath || `~/.claude/${config.category}/${config.slug}.md`
   return (
-    <DetailLayout backTo="/configs" backLabel="Configs">
-      <DetailMeta>
-        <CategoryBadge category={config.category} />
-        <span className="meta-dot">·</span>
-        <span>{installPath}</span>
-      </DetailMeta>
-
-      <DetailTitle>{config.title}</DetailTitle>
-      <DetailSummary>{config.description}</DetailSummary>
-      <DetailTags tags={config.tags} />
-
-      <hr className="post-divider" />
-
-      <DetailBody html={config.contentHtml} />
-    </DetailLayout>
+    <NoteDetail
+      backTo="/configs"
+      backLabel="Configs"
+      badges={<CategoryBadge category={config.category} />}
+      meta={[config.installPath]}
+      title={config.title}
+      summary={config.description}
+      tags={config.tags}
+      html={config.contentHtml}
+      related={config.related}
+      backlinks={config.backlinks}
+    />
   )
 }

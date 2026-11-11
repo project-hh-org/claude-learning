@@ -8,6 +8,7 @@ import remarkRehype from 'remark-rehype'
 import rehypeHighlight from 'rehype-highlight'
 import rehypeStringify from 'rehype-stringify'
 import { remarkWikilink, escapeWikilinkPipesInTables } from './wikilink.js'
+import { resolveRelated, getBacklinks } from './links.js'
 import { toDateString } from './date.js'
 
 const IDEAS_DIR = path.join(process.cwd(), 'ideas')
@@ -75,6 +76,8 @@ export async function getIdeaBySlug(slug) {
     source_session_project: data.source_session_project || null,
     stage:                  data.stage                  || 'seedling',
     tags:                   data.tags                   || [],
+    related:                resolveRelated(data.related),
+    backlinks:              getBacklinks(`/ideas/${slug}`),
     contentHtml,
   }
 }

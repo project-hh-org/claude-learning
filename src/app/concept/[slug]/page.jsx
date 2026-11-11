@@ -2,10 +2,6 @@ import { getAllConceptSlugs, getConceptBySlug } from '@/lib/concepts'
 import ConceptDetail from '@/components/detail/ConceptDetail'
 import { notFound } from 'next/navigation'
 
-function getConceptSlugSet() {
-  return new Set(getAllConceptSlugs().map(({ slug }) => slug))
-}
-
 const SITE_URL = 'https://claude-learning.project-hh.com'
 
 export async function generateStaticParams() {
@@ -26,5 +22,5 @@ export default async function ConceptPage({ params }) {
   const concept = await getConceptBySlug(params.slug)
   if (!concept) notFound()
 
-  return <ConceptDetail concept={concept} conceptSlugs={getConceptSlugSet()} />
+  return <ConceptDetail concept={concept} />
 }

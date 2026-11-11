@@ -1,12 +1,13 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
+import TabNav from './TabNav'
 
 /**
- * DetailLayout — 5개 상세 페이지(PostDetail / ConceptDetail /
- * ConfigDetail / IdeaDetail / SeedDetail)가 공유하는 외곽 셸.
+ * DetailLayout — 모든 상세 페이지(NoteDetail)가 공유하는 외곽 셸.
  *
  *   <header>📚 Learning Log</header>
+ *   <TabNav />           ← 목록과 같은 탭 — 지금 어느 탭에 있는지 보인다
  *   <article.post-page>
  *     <button.back-btn>← {backLabel}</button>
  *     {children}
@@ -33,6 +34,8 @@ export default function DetailLayout({ backTo = '/', backLabel = '뒤로', child
           📚 Learning Log <span>· 다희의 개발 기록</span>
         </div>
       </header>
+
+      <TabNav />
 
       <article className="post-page">
         <button className="back-btn" onClick={() => router.push(backTo)}>

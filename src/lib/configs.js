@@ -8,6 +8,7 @@ import remarkRehype from 'remark-rehype'
 import rehypeHighlight from 'rehype-highlight'
 import rehypeStringify from 'rehype-stringify'
 import { remarkWikilink, escapeWikilinkPipesInTables } from './wikilink.js'
+import { resolveRelated, getBacklinks } from './links.js'
 
 const CONFIGS_DIR = path.join(process.cwd(), 'configs')
 
@@ -116,6 +117,8 @@ export async function getConfigBySlug(category, slug) {
     description: data.description || '',
     tags:        data.tags        || [],
     installPath: installPathFor(category, slug, entry.filePath),
+    related:     resolveRelated(data.related),
+    backlinks:   getBacklinks(`/configs/${category}/${slug}`),
     contentHtml,
     ...metaFor(category),
   }

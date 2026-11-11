@@ -8,6 +8,7 @@ import remarkRehype from 'remark-rehype'
 import rehypeHighlight from 'rehype-highlight'
 import rehypeStringify from 'rehype-stringify'
 import { remarkWikilink, escapeWikilinkPipesInTables } from './wikilink.js'
+import { resolveRelated, getBacklinks } from './links.js'
 import { toDateString } from './date.js'
 
 const SEEDS_DIR = path.join(process.cwd(), 'seeds')
@@ -108,6 +109,8 @@ export async function getSeedBySlug(slug) {
     tags:                   data.tags                   || [],
     pitch:                  extractPitch(content),
     starterPrompt,
+    related:                resolveRelated(data.related),
+    backlinks:              getBacklinks(`/seeds/${slug}`),
     contentHtml,
   }
 }
