@@ -7,6 +7,7 @@ import remarkGfm from 'remark-gfm'
 import remarkRehype from 'remark-rehype'
 import rehypeHighlight from 'rehype-highlight'
 import rehypeStringify from 'rehype-stringify'
+import { remarkWikilink, escapeWikilinkPipesInTables } from './wikilink.js'
 
 const CONFIGS_DIR = path.join(process.cwd(), 'configs')
 
@@ -49,10 +50,11 @@ async function markdownToHtml(content) {
   const result = await unified()
     .use(remarkParse)
     .use(remarkGfm)
+    .use(remarkWikilink)
     .use(remarkRehype)
     .use(rehypeHighlight)
     .use(rehypeStringify)
-    .process(content)
+    .process(escapeWikilinkPipesInTables(content))
   return String(result)
 }
 

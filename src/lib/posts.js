@@ -7,21 +7,21 @@ import remarkGfm from 'remark-gfm'
 import remarkRehype from 'remark-rehype'
 import rehypeHighlight from 'rehype-highlight'
 import rehypeStringify from 'rehype-stringify'
-import { wikilinkToHtml, extractWikilinks } from './wikilink.js'
+import { remarkWikilink, escapeWikilinkPipesInTables, extractWikilinks } from './wikilink.js'
 import { toDateString } from './date.js'
 
 const ENTRIES_DIR = path.join(process.cwd(), 'entries')
 
 /** 마크다운 본문 → HTML 변환 (wikilink 포함) */
 async function markdownToHtml(content) {
-  const withLinks = wikilinkToHtml(content)
   const result = await unified()
     .use(remarkParse)
     .use(remarkGfm)
+    .use(remarkWikilink)
     .use(remarkRehype)
     .use(rehypeHighlight)
     .use(rehypeStringify)
-    .process(withLinks)
+    .process(escapeWikilinkPipesInTables(content))
   return String(result)
 }
 

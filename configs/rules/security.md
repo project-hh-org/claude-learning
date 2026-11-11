@@ -72,5 +72,5 @@ throw new Error(`Auth failed for user=${username} pass=${password}`);
 
 ## 관련 노트
 
-이 규칙의 실제 구현 패턴: [[concepts/aws-secrets-manager-pattern|AWS Secrets Manager 패턴]]
-터미널 적용 사례: [[2026-05-07-clickhouse-terminal-access|ClickHouse 터미널 접속]]
+- 이 규칙의 실제 구현 패턴: [[aws-secrets-manager-pattern|AWS Secrets Manager 패턴]]
+- 터미널 적용 사례: [[2026-05-07-clickhouse-terminal-access|ClickHouse 터미널 접속]]

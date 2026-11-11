@@ -7,20 +7,20 @@ import remarkGfm from 'remark-gfm'
 import remarkRehype from 'remark-rehype'
 import rehypeHighlight from 'rehype-highlight'
 import rehypeStringify from 'rehype-stringify'
-import { wikilinkToHtml } from './wikilink.js'
+import { remarkWikilink, escapeWikilinkPipesInTables } from './wikilink.js'
 import { toDateString } from './date.js'
 
 const IDEAS_DIR = path.join(process.cwd(), 'ideas')
 
 async function markdownToHtml(content) {
-  const withLinks = wikilinkToHtml(content)
   const result = await unified()
     .use(remarkParse)
     .use(remarkGfm)
+    .use(remarkWikilink)
     .use(remarkRehype)
     .use(rehypeHighlight)
     .use(rehypeStringify)
-    .process(withLinks)
+    .process(escapeWikilinkPipesInTables(content))
   return String(result)
 }
 
