@@ -35,8 +35,14 @@ $HOME_RE
 EOF
 
 # 차단어: 주석·공백 줄 제거, 고정 문자열로 대소문자 무시 비교
+# 목록이 있는데 읽지 못하면(권한·iCloud 접근 등) 통과시키지 않고 실패로 끝낸다 — 조용히 검사가 빠지지 않게
 : > "$WORK/deny"
-[ -f "$DENYLIST" ] && sed 's/#.*//; s/^[[:space:]]*//; s/[[:space:]]*$//; /^$/d' "$DENYLIST" > "$WORK/deny"
+if [ -e "$DENYLIST" ] || [ -L "$DENYLIST" ]; then
+  if ! sed 's/#.*//; s/^[[:space:]]*//; s/[[:space:]]*$//; /^$/d' "$DENYLIST" > "$WORK/deny" 2>/dev/null; then
+    echo "차단어 목록을 읽을 수 없음: $DENYLIST — 검사 불가로 처리"
+    exit 2
+  fi
+fi
 
 # 입력: "<라벨>\t<줄 내용>" 스트림 → 걸린 줄의 라벨 출력
 # 패턴은 내용에만 대조한다 (라벨의 절대 경로가 홈 경로 패턴에 걸리지 않게)

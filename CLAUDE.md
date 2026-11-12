@@ -97,7 +97,8 @@ src/
     details.css      post-page, post-meta, post-title, post-body, copy-btn
     mobile.css       모든 @media (max-width: 740px) — 마지막 import 필수
 scripts/
-  bootstrap.sh                  ← 새 기기 1회 셋업 (npm install + claude config)
+  bootstrap.sh                  ← 새 기기 1회 셋업 (npm·claude config·차단어 목록·launchd·Aside 연결)
+  install-aside.sh              ← Aside 스킬 링크 + AGENTS.md 캡처 규칙(aside-agents-capture.md, 마커 블록)
   install-claude-config.sh      ← Code: skills/rules/commands 심볼릭 링크 + Stop hook + vault 경로 기록
   setup-claude-desktop.sh       ← chat app: filesystem MCP + Custom Instructions 가이드
   install-launchd.sh            ← launchd 작업 2개: 워처(상주) + Aside 캡처(30분마다)

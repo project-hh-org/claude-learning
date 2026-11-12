@@ -132,4 +132,26 @@ for (const rel of prev) {
 if (!DRY && JSON.stringify(prev) !== JSON.stringify(next)) {
   fs.writeFileSync(MANIFEST, JSON.stringify(next, null, 2) + '\n')
 }
+
+// 공개 검사 차단어 목록을 iCloud 백업에 사본으로 둔다 (새 기기 bootstrap이 여기서 가져감).
+// 원본은 로컬 실파일이어야 한다 — launchd 워처는 iCloud 경로를 읽지 못한다.
+const DENY_LOCAL = path.join(os.homedir(), '.claude', 'learning-capture', 'public-denylist.txt')
+const ICLOUD_BACKUP = path.join(os.homedir(), 'Library/Mobile Documents/com~apple~CloudDocs/claude/claude-code-home-backup')
+const DENY_BACKUP = path.join(ICLOUD_BACKUP, 'learning-capture', 'public-denylist.txt')
+// 내용(주석·빈 줄 제외)이 없는 로컬 목록은 올리지 않는다 — 새 기기의 빈 양식이 실제 백업을 덮어쓰지 않게
+const hasEntries = buf => buf.toString('utf-8').split('\n').some(l => l.replace(/#.*/, '').trim())
+try {
+  const localIsFile = fs.existsSync(DENY_LOCAL) && fs.lstatSync(DENY_LOCAL).isFile()
+  if (!DRY && localIsFile && fs.existsSync(ICLOUD_BACKUP)) {
+    const local = fs.readFileSync(DENY_LOCAL)
+    const backup = fs.existsSync(DENY_BACKUP) ? fs.readFileSync(DENY_BACKUP) : null
+    if (hasEntries(local) && (!backup || !local.equals(backup))) {
+      fs.mkdirSync(path.dirname(DENY_BACKUP), { recursive: true })
+      fs.writeFileSync(DENY_BACKUP, local)
+      log('차단어 목록 iCloud 백업 갱신')
+    }
+  }
+} catch (e) {
+  log(`차단어 목록 백업 실패: ${e.message}`)
+}
 if (DRY) console.log(`변경 ${changed}건`)
