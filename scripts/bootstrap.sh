@@ -2,11 +2,11 @@
 # =============================================================
 # bootstrap.sh — 새 기기에서 1회 실행
 #
-# 일반 흐름 (이 레포는 iCloud에 두지 않는다 — GitHub로만 동기화):
-#   0) iCloud 동기화가 끝난 뒤 Claude 설정 복원 (rules·commands·agents·CLAUDE.md):
-#      bash ~/Library/Mobile\ Documents/com~apple~CloudDocs/claude/claude-code-home-backup/restore-on-new-machine.sh
+# 일반 흐름 (이 레포는 iCloud에 두지 않는다 — GitHub로만 동기화). 자세한 절차: README.md "새 기기 셋업"
 #   1) git clone git@github.com:project-hh-org/claude-learning.git ~/projects/claude-learning
-#   2) bash ~/projects/claude-learning/scripts/bootstrap.sh
+#   2) (새 기기에서 한 번만) iCloud 백업의 Claude 설정 연결:
+#      bash ~/projects/claude-learning/scripts/restore-claude-home.sh
+#   3) bash ~/projects/claude-learning/scripts/bootstrap.sh
 #
 # 다음을 자동 수행:
 #   - npm install (블로그 빌드용 의존성)

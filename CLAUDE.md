@@ -6,7 +6,7 @@ URL: https://claude-learning.project-hh.com
 
 > ⚠️ **이 레포를 iCloud Drive 안에 두지 않는다.** 위치: `~/projects/claude-learning`, 기기 간 동기화는 GitHub로만 한다.  
 > iCloud가 `.git` 안의 파일을 내용 없는(dataless) 상태로 비우면 pack 파일이 깨진 것처럼 보이고 push까지 거절된다 ([[icloud-dataless-git-repo]]).  
-> 다른 기기에서는 iCloud 폴더를 쓰지 말고 `git clone` 후 `bash scripts/bootstrap.sh`로 셋업한다.
+> 다른 기기에서는 iCloud 폴더를 쓰지 말고 `git clone` → `bash scripts/restore-claude-home.sh`(새 기기에서 한 번만) → `bash scripts/bootstrap.sh`로 셋업한다. 자세한 절차는 README "새 기기 셋업".
 
 ## 컴포넌트 컨벤션
 
@@ -97,6 +97,7 @@ src/
     details.css      post-page, post-meta, post-title, post-body, copy-btn
     mobile.css       모든 @media (max-width: 740px) — 마지막 import 필수
 scripts/
+  restore-claude-home.sh        ← 새 기기에서 한 번만: iCloud 백업의 Claude 설정을 ~/.claude에 링크 (bootstrap 전에)
   bootstrap.sh                  ← 새 기기 1회 셋업 (npm·claude config·차단어 목록·launchd·Aside 연결)
   install-aside.sh              ← Aside 스킬 링크 + AGENTS.md 캡처 규칙(aside-agents-capture.md, 마커 블록)
   install-claude-config.sh      ← Code: skills/rules/commands 심볼릭 링크 + Stop hook + vault 경로 기록
