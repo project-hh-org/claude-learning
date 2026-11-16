@@ -1,8 +1,9 @@
 #!/bin/bash
 # =============================================================
-# macOS launchd 작업 2개 등록
-#   dev.claude.learn-watcher  로그인 시 시작, 상주 — 노트·설정 폴더 자동 push (watch-and-push.sh)
-#   dev.claude.aside-capture  30분마다 — Aside 대화에서 개념·발상 후보 추출 (llm-capture.sh --aside-sweep)
+# macOS launchd 작업 3개 등록
+#   dev.claude.learn-watcher    로그인 시 시작, 상주 — 노트·설정 폴더 자동 push (watch-and-push.sh)
+#   dev.claude.aside-capture    30분마다 — Aside 대화에서 개념·발상 후보 추출 (llm-capture.sh --aside-sweep)
+#   dev.claude.review-reminder  매주 월요일 10:00 — 검토 대기 후보가 있으면 macOS 알림 (review-reminder.sh)
 #
 # 실행: bash scripts/install-launchd.sh
 # 제거: bash scripts/install-launchd.sh --uninstall
@@ -15,9 +16,13 @@ LOG_PATH="/tmp/claude-learn-watcher.log"
 ASIDE_LABEL="dev.claude.aside-capture"
 ASIDE_PLIST="$HOME/Library/LaunchAgents/${ASIDE_LABEL}.plist"
 ASIDE_INTERVAL=1800
+REMIND_LABEL="dev.claude.review-reminder"
+REMIND_PLIST="$HOME/Library/LaunchAgents/${REMIND_LABEL}.plist"
+REMIND_WEEKDAY=1   # 0=일 1=월 … 6=토
+REMIND_HOUR=10
 
 if [ "$1" = "--uninstall" ]; then
-  for p in "$PLIST_PATH" "$ASIDE_PLIST"; do
+  for p in "$PLIST_PATH" "$ASIDE_PLIST" "$REMIND_PLIST"; do
     launchctl unload "$p" 2>/dev/null
     rm -f "$p"
   done
@@ -137,6 +142,49 @@ EOF
       echo "❌ Aside 캡처 등록 실패. 터미널에서 직접: launchctl load \"$ASIDE_PLIST\""
     fi
   fi
+fi
+
+# ── 검토 알림 (매주) ──────────────────────────────────────
+# 잠자기 중이라 정각을 놓치면 깨어난 직후 한 번 실행된다 (StartCalendarInterval 동작)
+cat > "$REMIND_PLIST" <<EOF
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN"
+  "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>${REMIND_LABEL}</string>
+
+  <key>ProgramArguments</key>
+  <array>
+    <string>/bin/bash</string>
+    <string>${REPO_DIR}/scripts/review-reminder.sh</string>
+  </array>
+
+  <key>StartCalendarInterval</key>
+  <dict>
+    <key>Weekday</key>
+    <integer>${REMIND_WEEKDAY}</integer>
+    <key>Hour</key>
+    <integer>${REMIND_HOUR}</integer>
+    <key>Minute</key>
+    <integer>0</integer>
+  </dict>
+
+  <key>StandardOutPath</key>
+  <string>/tmp/claude-review-reminder.log</string>
+
+  <key>StandardErrorPath</key>
+  <string>/tmp/claude-review-reminder.log</string>
+</dict>
+</plist>
+EOF
+launchctl unload "$REMIND_PLIST" 2>/dev/null
+launchctl load "$REMIND_PLIST"
+if launchctl list | grep -q "$REMIND_LABEL"; then
+  echo "✅ 검토 알림 등록 완료 (매주 월요일 ${REMIND_HOUR}:00, 대기 후보가 있을 때만)"
+else
+  echo "❌ 검토 알림 등록 실패. 터미널에서 직접: launchctl load \"$REMIND_PLIST\""
 fi
 
 echo "   상태: launchctl list | grep claude"

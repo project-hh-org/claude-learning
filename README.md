@@ -152,7 +152,7 @@ bash ~/projects/claude-learning/scripts/bootstrap.sh
 | npm install | 블로그 빌드용 의존성 |
 | `install-claude-config.sh` | 캡처 스킬·규칙·커맨드를 `~/.claude/...`에 링크, 캡처·설정 동기화 hook을 `settings.json`에 등록, 이 레포 경로를 `~/.claude/learning-vault.path`에 기록 (다른 프로젝트에서 작업해도 캡처가 항상 이 레포로 모인다) |
 | 차단어 목록 | 공개 검사용 `~/.claude/learning-capture/public-denylist.txt`. 없으면 iCloud 백업 사본을 복사하고, 그것도 없으면 빈 양식을 만든다 |
-| `install-launchd.sh` | launchd 작업 2개 — 자동 push 워처(상주), Aside 대화 캡처(30분마다). fswatch가 없으면 건너뛰고 안내 |
+| `install-launchd.sh` | launchd 작업 3개 — 자동 push 워처(상주), Aside 대화 캡처(30분마다), 검토 알림(매주 월요일 10시, 대기 후보가 있을 때만 macOS 알림). fswatch가 없으면 건너뛰고 안내 |
 | `install-aside.sh` | Aside 스킬 링크 + Aside `AGENTS.md`에 캡처 규칙 블록. Aside가 없으면 건너뜀 |
 
 여러 번 실행해도 결과가 같다. npm install이나 `install-claude-config.sh`가 실패하면(node가 없는 경우 등) 그 자리에서 멈추고, launchd·Aside 단계는 실패해도 경고를 남기고 다음으로 넘어간다.
@@ -168,7 +168,7 @@ open -e ~/.claude/learning-capture/public-denylist.txt
 ### 5. 확인
 
 ```bash
-launchctl list | grep claude                         # learn-watcher, aside-capture 두 줄
+launchctl list | grep claude                         # learn-watcher, aside-capture, review-reminder 세 줄
 ```
 ```bash
 tail -5 /tmp/claude-learn-watcher.log                # "감시 시작: entries concepts ideas seeds configs"
@@ -241,7 +241,7 @@ entries/ · concepts/ · ideas/ · seeds/ · configs/ 에 파일 저장
 |---|---|---|
 | 수집 (Claude Code) | Stop·SessionEnd hook `llm-capture.sh` — 새 대화를 haiku로 추출 | `concepts/_unsorted/`, `ideas/_unsorted/` (비공개, gitignore) |
 | 수집 (Aside) | launchd 30분 작업 `llm-capture.sh --aside-sweep` | 위와 같음, `source: "aside"` |
-| 검토 | `/review-captures` — 후보를 골라 일반화·공개 검사 후 승격 | `concepts/` · `ideas/` · `seeds/` → 워처가 배포 |
+| 검토 | `/review-captures` — 후보를 골라 일반화·공개 검사 후 승격. 매주 월요일 10시에 대기 후보 수를 macOS 알림으로 알려준다 (`scripts/review-reminder.sh`) | `concepts/` · `ideas/` · `seeds/` → 워처가 배포 |
 | 설정 공개 | `configs/sync.json`에 적은 `~/.claude` 설정만 Stop hook이 `configs/`로 복사 | Configs 탭 |
 
 자세한 구조는 [`CLAUDE.md`](CLAUDE.md)의 "자동 캡처 파이프라인", 셋업 상세는 [`docs/idea-capture-setup.md`](docs/idea-capture-setup.md).

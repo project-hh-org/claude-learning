@@ -102,7 +102,8 @@ scripts/
   install-aside.sh              ← Aside 스킬 링크 + AGENTS.md 캡처 규칙(aside-agents-capture.md, 마커 블록)
   install-claude-config.sh      ← Code: skills/rules/commands 심볼릭 링크 + Stop hook + vault 경로 기록
   setup-claude-desktop.sh       ← chat app: filesystem MCP + Custom Instructions 가이드
-  install-launchd.sh            ← launchd 작업 2개: 워처(상주) + Aside 캡처(30분마다)
+  install-launchd.sh            ← launchd 작업 3개: 워처(상주) + Aside 캡처(30분마다) + 검토 알림(매주 월 10시)
+  review-reminder.sh            ← _unsorted 후보 수를 세서 1건 이상이면 macOS 알림 (/review-captures 권유)
   watch-and-push.sh             ← 노트·설정 폴더 변경 감지 + 공개 검사 + 자동 commit/push
   public-scan.sh                ← 공개 검사 (자격증명·홈 경로·레포 밖 차단어 목록)
   sync-claude-configs.mjs       ← configs/sync.json 공개 목록의 ~/.claude 설정을 configs/로 복사 (Stop hook)
